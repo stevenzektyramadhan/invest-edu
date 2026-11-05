@@ -201,7 +201,7 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     rawPrice: 1485,
     unitPrefix: "NAB Rp ",
     unitSuffix: "",
-    tradingViewSymbol: "TVC:ID10Y",
+    tradingViewSymbol: "",
     high24h: 1486,
     low24h: 1484,
     supportLevel: 1475,

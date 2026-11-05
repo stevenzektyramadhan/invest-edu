@@ -227,9 +227,14 @@ export default function TradingTerminalModal({
   onDeleteAlarm,
   onSimulatePriceHit,
 }: TradingTerminalModalProps) {
+  const hasTradingViewSymbol = Boolean(
+    item.tradingViewSymbol && item.id !== "rdpu-index"
+  );
+  const isIdxEmbedRestricted = item.tradingViewSymbol.startsWith("IDX:");
+
   const [timeframe, setTimeframe] = useState<"1D" | "1W" | "1M" | "1Y">("1W");
   const [chartStyle, setChartStyle] = useState<"CANDLE" | "LINE" | "TV_LIVE">(
-    "CANDLE"
+    hasTradingViewSymbol && !isIdxEmbedRestricted ? "TV_LIVE" : "CANDLE"
   );
 
   const [condition, setCondition] = useState<AlarmCondition>("BELOW");
@@ -295,6 +300,7 @@ export default function TradingTerminalModal({
           textColor: "#d1d4dc",
           fontFamily: "monospace",
           fontSize: 11,
+          attributionLogo: true,
         },
         grid: {
           vertLines: { color: "#1e222d" },
@@ -552,23 +558,24 @@ export default function TradingTerminalModal({
               </span>
             </div>
 
-            <div className="flex items-center gap-1 pr-3 border-r border-slate-800">
-              {(["1D", "1W", "1M", "1Y"] as const).map((tf) => (
-                <button
-                  key={tf}
-                  type="button"
-                  onClick={() => setTimeframe(tf)}
-                  disabled={chartStyle === "TV_LIVE"}
-                  className={`rounded px-2 py-1 text-xs font-bold transition-colors ${
-                    timeframe === tf && chartStyle !== "TV_LIVE"
-                      ? "bg-sky-600 text-white"
-                      : "text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-35"
-                  }`}
-                >
-                  {tf}
-                </button>
-              ))}
-            </div>
+            {chartStyle !== "TV_LIVE" && (
+              <div className="flex items-center gap-1 pr-3 border-r border-slate-800">
+                {(["1D", "1W", "1M", "1Y"] as const).map((tf) => (
+                  <button
+                    key={tf}
+                    type="button"
+                    onClick={() => setTimeframe(tf)}
+                    className={`rounded px-2 py-1 text-xs font-bold transition-colors ${
+                      timeframe === tf
+                        ? "bg-sky-600 text-white"
+                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    {tf}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="flex flex-wrap items-center gap-1">
               <button
@@ -581,7 +588,7 @@ export default function TradingTerminalModal({
                 }`}
               >
                 <CandlestickChart className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Candlestick</span>
+                <span>Candle (ilustrasi)</span>
               </button>
               <button
                 type="button"
@@ -593,20 +600,26 @@ export default function TradingTerminalModal({
                 }`}
               >
                 <LineChart className="h-3.5 w-3.5 text-sky-400" />
-                <span>Line</span>
+                <span>Garis (ilustrasi)</span>
               </button>
-              <button
-                type="button"
-                onClick={() => setChartStyle("TV_LIVE")}
-                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  chartStyle === "TV_LIVE"
-                    ? "bg-sky-600 text-white"
-                    : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
-                }`}
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                <span>TradingView Embed</span>
-              </button>
+              {hasTradingViewSymbol ? (
+                <button
+                  type="button"
+                  onClick={() => setChartStyle("TV_LIVE")}
+                  className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
+                    chartStyle === "TV_LIVE"
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
+                  }`}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>TradingView (data asli)</span>
+                </button>
+              ) : (
+                <span className="rounded border border-slate-800 bg-slate-950 px-2.5 py-1 text-[11px] font-medium text-slate-400">
+                  Tidak ada grafik pasar langsung untuk instrumen ini
+                </span>
+              )}
             </div>
           </div>
 
@@ -623,6 +636,38 @@ export default function TradingTerminalModal({
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="tv-modal-grid">
             <div className="tv-modal-chart-pane">
+              {(item.id === "gold-idr" || isIdxEmbedRestricted || chartStyle !== "TV_LIVE") && (
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-900/80 px-3.5 py-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {chartStyle !== "TV_LIVE" && (
+                      <span className="inline-flex items-center gap-1.5 rounded border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[11px] font-bold text-amber-300">
+                        Ilustrasi — bukan data pasar
+                      </span>
+                    )}
+                    {item.id === "gold-idr" && (
+                      <span className="inline-flex items-center gap-1.5 rounded border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-300">
+                        Grafik TradingView dalam USD per troy ounce
+                      </span>
+                    )}
+                    {isIdxEmbedRestricted && (
+                      <span className="text-[11px] text-slate-300">
+                        Simbol BEI ({item.tradingViewSymbol}) tidak tersedia di widget embed pihak ketiga TradingView — menggunakan fallback mode{" "}
+                        <strong className="text-amber-300">Ilustrasi — bukan data pasar</strong>.
+                      </span>
+                    )}
+                  </div>
+                  {isIdxEmbedRestricted && chartStyle === "TV_LIVE" && (
+                    <button
+                      type="button"
+                      onClick={() => setChartStyle("CANDLE")}
+                      className="rounded border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[11px] font-semibold text-amber-200 hover:bg-amber-500/30"
+                    >
+                      Beralih ke Ilustrasi Berlabel
+                    </button>
+                  )}
+                </div>
+              )}
+
               <div
                 style={{ minHeight: "420px" }}
                 className="relative w-full h-[440px] bg-slate-950 select-none overflow-hidden"
@@ -630,7 +675,10 @@ export default function TradingTerminalModal({
                 {chartStyle !== "TV_LIVE" && displayCandle && (
                   <div className="pointer-events-none absolute top-2.5 left-3 z-20 flex flex-wrap items-center gap-x-3 gap-y-1 rounded bg-slate-900/90 px-2.5 py-1 text-[11px] font-mono border border-slate-800 shadow">
                     <span className="font-sans font-bold text-white">
-                      {item.name} ({ timeframe })
+                      {item.name} ({timeframe})
+                    </span>
+                    <span className="rounded bg-amber-500/20 px-1.5 py-0.5 font-sans text-[10px] font-bold text-amber-300">
+                      Ilustrasi — bukan data pasar
                     </span>
                     <span className="text-slate-400">
                       O{" "}
@@ -668,7 +716,7 @@ export default function TradingTerminalModal({
                   </div>
                 )}
 
-                {chartStyle === "TV_LIVE" ? (
+                {chartStyle === "TV_LIVE" && hasTradingViewSymbol ? (
                   <iframe
                     title={`TradingView ${item.symbol}`}
                     src={`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(

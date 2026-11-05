@@ -99,10 +99,10 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 6. Verifikasi embed `https://s.tradingview.com/widgetembed/` untuk simbol IDX (`IDX:COMPOSITE`, `IDX:BBCA`, `IDX:BBRI`). Jika tidak tersedia, tampilkan pesan yang jelas dan fallback ke mode ilustrasi **berlabel**.
 7. Jangan menyembunyikan atribusi TradingView; cek bahwa opsi `attributionLogo` pada `lightweight-charts` tidak dimatikan.
 **Acceptance criteria**:
-- [ ] Membuka modal untuk BTC langsung menampilkan chart TradingView, bukan candle sintetis.
-- [ ] Setiap tampilan candle/garis buatan sendiri memiliki badge "Ilustrasi — bukan data pasar".
-- [ ] Opsi TradingView tidak muncul untuk `rdpu-index`.
-- [ ] Signature `generateOHLCCandles` tidak berubah (test bergantung padanya).
+- [x] Membuka modal untuk BTC langsung menampilkan chart TradingView, bukan candle sintetis.
+- [x] Setiap tampilan candle/garis buatan sendiri memiliki badge "Ilustrasi — bukan data pasar".
+- [x] Opsi TradingView tidak muncul untuk `rdpu-index`.
+- [x] Signature `generateOHLCCandles` tidak berubah (test bergantung padanya).
 **Catatan**: Jangan hapus fitur chart ilustrasi; ia berguna sebagai alat bantu belajar jika **berlabel jujur**.
 
 ### Task 1.3 — Status data per item (live vs contoh statis)
@@ -469,7 +469,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | Task | Status | Catatan |
 |------|--------|---------|
 | 1.1 — Pagar pengaman klasifikasi risiko | ✅ Done | `classifyRiskProfile`, aturan keras `emergency_fund`/`horizon`, field `reasons`, UI warning & test |
-| 1.2 — Label chart sintetis, TradingView default | ⏳ Pending | |
+| 1.2 — Label chart sintetis, TradingView default | ✅ Done | Default `TV_LIVE`, badge "Ilustrasi — bukan data pasar", sembunyikan TV di `rdpu-index`, catatan `gold-idr` & fallback IDX |
 | 1.3 — Status data per item | ⏳ Pending | `TODO(owner)`: isi tanggal snapshot statis |
 | 1.4 — Hapus support/resistance palsu | ⏳ Pending | |
 | 1.5 — Fix `ensureSchema` | ⏳ Pending | |
