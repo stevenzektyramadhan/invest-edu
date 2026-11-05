@@ -27,16 +27,21 @@ let cachedMarketPayload: {
   };
 } | null = null;
 
-const CACHE_TTL_MS = 60_000;
+const LIVE_CACHE_TTL_MS = 60_000;
+const FALLBACK_CACHE_TTL_MS = 10_000;
 
 export async function GET() {
   const now = Date.now();
-  if (cachedMarketPayload && now - cachedMarketPayload.timestamp < CACHE_TTL_MS) {
+  const cacheTtl = cachedMarketPayload?.data.isLive
+    ? LIVE_CACHE_TTL_MS
+    : FALLBACK_CACHE_TTL_MS;
+  if (cachedMarketPayload && now - cachedMarketPayload.timestamp < cacheTtl) {
     return NextResponse.json(cachedMarketPayload.data);
   }
 
   const items: MarketItem[] = FALLBACK_ITEMS.map((i) => ({ ...i }));
   let liveSourceUsed = false;
+  const liveAsOf = new Date(now).toISOString();
 
   try {
     const controller = new AbortController();
@@ -78,7 +83,9 @@ export async function GET() {
                 (coin.price_change_percentage_7d_in_currency ?? 0).toFixed(2)
               ),
               sparkline: sampled.length >= 4 ? sampled : items[targetIdx].sparkline,
-              source: "CoinGecko Live API",
+              source: "CoinGecko API",
+              dataStatus: "live",
+              asOf: liveAsOf,
             };
 
             if (coin.id === "pax-gold" && coin.current_price) {
@@ -101,7 +108,9 @@ export async function GET() {
                     sampled.length >= 4
                       ? sampled.map((p) => Math.round(p / 31.1035))
                       : items[goldGramIdx].sparkline,
-                  source: "Live Spot Gold (XAU/IDR)",
+                  source: "Spot Gold (XAU/IDR via CoinGecko)",
+                  dataStatus: "live",
+                  asOf: liveAsOf,
                 };
               }
             }

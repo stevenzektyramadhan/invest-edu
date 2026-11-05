@@ -116,9 +116,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 5. `market/page.tsx`: hapus klaim global "Live Public API"; tampilkan pill per baris ("Live" / "Contoh statis"), plus banner ringkas bila ada item statis.
 6. Panel indikator makro (`DEFAULT_MACRO_INDICATORS`) diberi label "Data contoh (statis)" dan tanggal `asOf`.
 **Acceptance criteria**:
-- [ ] Saat CoinGecko berhasil: BTC/ETH/emas berlabel Live, IHSG/BBCA/BBRI/S&P/RDPU/SBN berlabel Contoh statis.
-- [ ] Tidak ada teks "Live" yang berlaku untuk seluruh halaman.
-- [ ] Panel makro berlabel statis.
+- [x] Saat CoinGecko berhasil: BTC/ETH/emas berlabel Live, IHSG/BBCA/BBRI/S&P/RDPU/SBN berlabel Contoh statis.
+- [x] Tidak ada teks "Live" yang berlaku untuk seluruh halaman.
+- [x] Panel makro berlabel statis.
 **Catatan**: Jangan mengisi angka "terkini" dari ingatan. Mengganti konstanta dengan sumber resmi (BI/BPS/IDX) adalah pekerjaan terpisah (Fase 6).
 
 ### Task 1.4 — Hapus support/resistance palsu
@@ -470,7 +470,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 |------|--------|---------|
 | 1.1 — Pagar pengaman klasifikasi risiko | ✅ Done | `classifyRiskProfile`, aturan keras `emergency_fund`/`horizon`, field `reasons`, UI warning & test |
 | 1.2 — Label chart sintetis, TradingView default | ✅ Done | Default `TV_LIVE`, badge "Ilustrasi — bukan data pasar", sembunyikan TV di `rdpu-index`, catatan `gold-idr` & fallback IDX |
-| 1.3 — Status data per item | ⏳ Pending | `TODO(owner)`: isi tanggal snapshot statis |
+| 1.3 — Status data per item | ✅ Done | `dataStatus` ("live" \| "static"), `asOf` (`STATIC_SNAPSHOT_AS_OF = "TODO(owner)"`), fallback cache 10s, pill per item & label makro statis |
 | 1.4 — Hapus support/resistance palsu | ⏳ Pending | |
 | 1.5 — Fix `ensureSchema` | ⏳ Pending | |
 | 1.6 — Alarm harga jujur | ⏳ Pending | |

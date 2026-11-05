@@ -1,3 +1,5 @@
+export const STATIC_SNAPSHOT_AS_OF = "TODO(owner)";
+
 export interface MarketItem {
   id: string;
   symbol: string;
@@ -17,6 +19,8 @@ export interface MarketItem {
   sparkline: number[];
   educationalNote: string;
   source: string;
+  dataStatus: "live" | "static";
+  asOf: string;
 }
 
 export interface MacroIndicator {
@@ -52,6 +56,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [7210, 7235, 7220, 7260, 7290, 7310, 7328],
     educationalNote: "Tolok ukur utama kinerja seluruh saham di Bursa Efek Indonesia (BEI).",
     source: "BEI / Market Proxy",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "bbca",
@@ -72,6 +78,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [9650, 9700, 9675, 9750, 9800, 9825, 9850],
     educationalNote: "Saham perbankan berkapitalisasi pasar terbesar di Indonesia dengan ROE >20%.",
     source: "BEI / Market Proxy",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "bbri",
@@ -92,6 +100,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [4520, 4550, 4610, 4590, 4600, 4595, 4580],
     educationalNote: "Saham perbankan fokus UMKM dengan pembagian dividen tunai historis tinggi.",
     source: "BEI / Market Proxy",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "sp500",
@@ -112,6 +122,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [5780, 5810, 5805, 5840, 5865, 5875, 5892],
     educationalNote: "Indeks 500 perusahaan publik terbesar di Amerika Serikat; barometer ekuitas global.",
     source: "Global Index Proxy",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "gold-idr",
@@ -132,6 +144,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [1510000, 1518000, 1522000, 1530000, 1535000, 1540000, 1545000],
     educationalNote: "Harga acuan emas murni per gram; aset pelindung nilai terhadap inflasi.",
     source: "Spot Gold Proxy",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "pax-gold",
@@ -152,6 +166,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [43900000, 44100000, 44250000, 44400000, 44600000, 44700000, 44850000],
     educationalNote: "1 Troy Ounce setara 31,1035 gram emas murni di pasar komoditas internasional.",
     source: "CoinGecko PAXG / Spot",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "bitcoin",
@@ -172,6 +188,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [1350000000, 1365000000, 1380000000, 1372000000, 1395000000, 1410000000, 1425000000],
     educationalNote: "Aset kripto pertama & terbesar dengan suplai terbatas 21 juta koin.",
     source: "CoinGecko API",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "ethereum",
@@ -192,6 +210,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [44500000, 44900000, 45100000, 45000000, 45600000, 45900000, 46200000],
     educationalNote: "Jaringan smart contract terbesar untuk ekosistem DeFi dan tokenisasi aset.",
     source: "CoinGecko API",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "rdpu-index",
@@ -212,6 +232,8 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [1478, 1479, 1480, 1481, 1483, 1484, 1485],
     educationalNote: "Pergerakan NAB stabil naik perlahan; ideal untuk dana darurat dan kas.",
     source: "Acuan Pasar Uang",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
   {
     id: "sbn-10y",
@@ -232,5 +254,7 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     sparkline: [6.55, 6.58, 6.57, 6.6, 6.62, 6.64, 6.65],
     educationalNote: "Acuan utama kinerja Reksa Dana Pendapatan Tetap (RDPT) dan SBN Ritel.",
     source: "Acuan Obligasi Negara",
+    dataStatus: "static",
+    asOf: STATIC_SNAPSHOT_AS_OF,
   },
 ];

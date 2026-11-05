@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   FALLBACK_ITEMS,
   DEFAULT_MACRO_INDICATORS,
+  STATIC_SNAPSHOT_AS_OF,
   type MarketItem,
 } from "@/lib/market-data";
 import TradingTerminalModal, {
@@ -362,7 +363,7 @@ export default function MarketDashboardPage() {
               <span>Multi-Asset Market Monitor &amp; Price Alert</span>
             </div>
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Dashboard Pergerakan Pasar Real-Time
+              Dashboard Pemantauan Pasar &amp; Instrumen Acuan
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-neutral-400">
               Klik salah satu instrumen di bawah untuk membuka{" "}
@@ -400,13 +401,26 @@ export default function MarketDashboardPage() {
                 />
               </span>
               <span>
-                {isLive ? "Live Public API" : "Market Proxy Snapshot"} •{" "}
+                Status per instrumen ({items.filter((i) => i.dataStatus === "live").length} dari API publik,{" "}
+                {items.filter((i) => i.dataStatus === "static").length} contoh statis) •{" "}
                 {updatedAt || "--:--"}
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      {items.some((item) => item.dataStatus === "static") && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-200">
+          <strong>Catatan Sumber Data:</strong> Hanya instrumen berlabel{" "}
+          <span className="font-bold text-emerald-300">Live</span> (BTC, ETH, dan Emas via CoinGecko) yang diperbarui otomatis. Instrumen berlabel{" "}
+          <span className="font-bold text-amber-300">Contoh statis</span> menggunakan angka referensi pembelajaran (
+          {STATIC_SNAPSHOT_AS_OF === "TODO(owner)"
+            ? "Data contoh, belum diperbarui"
+            : `As of ${STATIC_SNAPSHOT_AS_OF}`}
+          ).
+        </div>
+      )}
 
       {/* Active Price Alarms Bar */}
       <section className="rounded-xl border border-neutral-800 bg-panel p-5">
@@ -505,9 +519,21 @@ export default function MarketDashboardPage() {
 
       {/* Macroeconomic Indicators Strip */}
       <section className="space-y-2.5">
-        <div className="flex items-center gap-2 text-xs font-medium text-neutral-400">
-          <Globe className="h-3.5 w-3.5 text-neutral-400" />
-          <span>Indikator Makroekonomi Acuan</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-neutral-400">
+          <div className="flex items-center gap-2">
+            <Globe className="h-3.5 w-3.5 text-neutral-400" />
+            <span>Indikator Makroekonomi Acuan</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
+              Data contoh (statis)
+            </span>
+            <span className="text-[11px] text-neutral-500">
+              {STATIC_SNAPSHOT_AS_OF === "TODO(owner)"
+                ? "Data contoh, belum diperbarui"
+                : `Tanggal snapshot: ${STATIC_SNAPSHOT_AS_OF}`}
+            </span>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {macroIndicators.map((ind) => (
@@ -577,6 +603,22 @@ export default function MarketDashboardPage() {
                     <span className="rounded border border-neutral-800 bg-neutral-900 px-2 py-0.5 text-xs text-neutral-400">
                       {item.category}
                     </span>
+                    {item.dataStatus === "live" ? (
+                      <span className="rounded border border-emerald-500/40 bg-emerald-500/15 px-2 py-0.5 text-[11px] font-bold text-emerald-300">
+                        Live
+                      </span>
+                    ) : (
+                      <span
+                        title={
+                          item.asOf === "TODO(owner)"
+                            ? "Data contoh, belum diperbarui"
+                            : `Snapshot: ${item.asOf}`
+                        }
+                        className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300"
+                      >
+                        Contoh statis
+                      </span>
+                    )}
                     {itemAlarmsCount > 0 && (
                       <span className="inline-flex items-center gap-1 rounded border border-neutral-700 bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-300">
                         <BellRing className="h-3 w-3" />
@@ -632,7 +674,13 @@ export default function MarketDashboardPage() {
                     positive={item.change7d >= 0}
                   />
                   <span className="mt-1 text-[11px] text-neutral-500">
-                    Tren 7 Hari ({item.source})
+                    Tren 7 Hari ({item.source} •{" "}
+                    {item.dataStatus === "live"
+                      ? "Live"
+                      : item.asOf === "TODO(owner)"
+                      ? "Data contoh, belum diperbarui"
+                      : `Contoh statis ${item.asOf}`}
+                    )
                   </span>
                 </div>
               </div>

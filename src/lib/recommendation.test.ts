@@ -156,6 +156,8 @@ const candles = generateOHLCCandles(
     sparkline: [9650, 9700, 9675, 9750, 9800, 9825, 9850],
     educationalNote: "",
     source: "Test",
+    dataStatus: "static",
+    asOf: "TODO(owner)",
   },
   "1W"
 );
