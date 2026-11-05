@@ -478,14 +478,27 @@ export default function RecommendationPage() {
               </div>
             </div>
 
-            {/* Tactical Actions */}
-            <div className="rounded-xl border border-neutral-800 bg-neutral-950/80 p-4 space-y-2">
+            <div className="rounded-xl border border-neutral-800 bg-neutral-950/80 p-4 space-y-2.5">
               <div className="text-xs font-semibold text-neutral-200">
-                Strategi Eksekusi & Alasan Makro
+                Mengapa Profil Ini Cocok untuk Anda
               </div>
               <p className="text-xs leading-relaxed text-neutral-300">
                 {recommendation.rationale}
               </p>
+              <ul className="space-y-1.5 pt-1 text-xs text-neutral-300">
+                {recommendation.reasons.map((reason, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-sky-400 shrink-0" />
+                    <span>{reason}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-neutral-950/80 p-4 space-y-2">
+              <div className="text-xs font-semibold text-neutral-200">
+                Strategi Eksekusi
+              </div>
               <ul className="space-y-1.5 pt-1 text-xs text-neutral-300">
                 {recommendation.tacticalActions.map((act, i) => (
                   <li key={i} className="flex items-start gap-2">

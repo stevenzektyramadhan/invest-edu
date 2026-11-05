@@ -107,10 +107,12 @@ for (const baseLevel of [1, 2, 3]) {
         if (emergencyFund === 1) {
           assert.equal(rec.profile, "Konservatif");
           assert.equal(kripto, 0);
+          assert.ok(rec.reasons.some((r) => r.toLowerCase().includes("dana darurat")));
         }
         if (horizon === 1) {
           assert.ok(saham <= 10, `horizon=1 must cap saham <= 10, got ${saham}`);
           assert.equal(kripto, 0, `horizon=1 must force kripto=0, got ${kripto}`);
+          assert.ok(rec.reasons.some((r) => r.toLowerCase().includes("jangka pendek")));
         }
         assert.ok(rec.scenarios.badPct <= rec.scenarios.basePct);
         assert.ok(rec.scenarios.basePct <= rec.scenarios.goodPct);
@@ -118,6 +120,23 @@ for (const baseLevel of [1, 2, 3]) {
     }
   }
 }
+
+const recUserA = generateRecommendation(10, "netral", {
+  horizon: 3,
+  drawdown: 2,
+  emergency_fund: 2,
+  income: 2,
+  experience: 1,
+});
+const recUserB = generateRecommendation(10, "netral", {
+  horizon: 2,
+  drawdown: 2,
+  emergency_fund: 2,
+  income: 2,
+  experience: 2,
+});
+assert.notDeepEqual(recUserA.reasons, recUserB.reasons);
+assert.notEqual(recUserA.rationale, recUserB.rationale);
 
 for (const assumption of Object.values(ASSET_SCENARIO_ASSUMPTIONS)) {
   assert.ok(assumption.source.length > 0);

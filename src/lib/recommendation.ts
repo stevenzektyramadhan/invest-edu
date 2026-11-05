@@ -309,46 +309,95 @@ function buildProfileReasons(
 
   if (emergencyFund === 1) {
     reasons.push(
-      "Dana darurat belum tersedia (< 3× pengeluaran bulanan), sehingga profil dibatasi maksimal Konservatif dan porsi kripto dikunci 0%."
+      "Dana darurat belum ada (< 3× pengeluaran bulanan), jadi prioritas pertama adalah membangunnya; profil dibatasi maksimal Konservatif dan porsi kripto dikunci 0%."
     );
   } else if (emergencyFund === 2) {
     reasons.push(
-      "Dana darurat sudah tersedia (3–6× pengeluaran bulanan) sebagai penyangga likuiditas dasar."
+      "Dana darurat sudah tersedia (3–6× pengeluaran bulanan) sebagai penyangga kebutuhan mendadak."
     );
   } else {
     reasons.push(
-      "Dana darurat sangat aman (> 6× pengeluaran bulanan) sehingga fondasi kas keluarga terjaga."
+      "Dana darurat sangat aman (> 6× pengeluaran bulanan) dan bebas utang konsumtif, sehingga fondasi kas keluarga terjaga."
     );
   }
 
   if (horizon === 1) {
     reasons.push(
-      "Horizon investasi jangka pendek (< 2 tahun), sehingga porsi saham dibatasi maksimal 10% dan kripto 0% agar modal pokok tidak tergerus volatilitas."
+      "Horizon investasi Anda jangka pendek (< 2 tahun), sehingga porsi saham dibatasi maksimal 10% dan kripto 0% agar modal pokok tidak tergerus volatilitas."
     );
   } else if (horizon === 2) {
     reasons.push(
-      "Horizon investasi menengah (3–5 tahun) memberi ruang terukur untuk kombinasi aset stabil dan bertumbuh."
+      "Horizon investasi Anda menengah (3–5 tahun), sehingga portofolio memadukan aset stabil dan aset pertumbuhan secara berimbang."
     );
   } else {
     reasons.push(
-      "Horizon investasi panjang (> 5 tahun) memberi waktu yang cukup untuk menyerap fluktuasi pasar saham."
+      "Horizon investasi Anda > 5 tahun, sehingga porsi saham bisa lebih besar karena ada waktu untuk melewati naik-turun pasar."
     );
   }
 
   if (income === 1) {
     reasons.push(
-      "Arus kas bulanan belum menentu, sehingga kemampuan menanggung risiko dibatasi pada level Konservatif."
+      "Arus penghasilan bulanan belum menentu, sehingga kemampuan menanggung risiko dibatasi pada level Konservatif."
+    );
+  } else if (income === 2) {
+    reasons.push(
+      "Arus penghasilan bulanan cukup stabil (bisa menyisihkan 10%–20%), mendukung cicilan investasi berkala."
+    );
+  } else {
+    reasons.push(
+      "Arus penghasilan bulanan sangat stabil (surplus kas > 25%), memberi ruang kapasitas risiko yang lebih longgar."
     );
   }
 
-  const tolerance = Math.round((drawdown + experience) / 2);
-  if (tolerance === 1) {
+  if (drawdown === 1) {
     reasons.push(
-      "Kenyamanan terhadap fluktuasi dan pengalaman pasar masih di tahap awal, sehingga profil disesuaikan agar tetap tenang saat pasar terkoreksi."
+      "Jika portofolio turun 20% Anda cenderung langsung menjual, sehingga porsi aset bergejolak ditekan agar tidak memicu jual panik."
+    );
+  } else if (drawdown === 2) {
+    reasons.push(
+      "Saat pasar turun 20% Anda memilih menahan dan mengevaluasi, sesuai dengan fluktuasi portofolio tingkat menengah."
+    );
+  } else {
+    reasons.push(
+      "Saat pasar turun 20% Anda siap menambah muatan di harga diskon, menunjukkan toleransi fluktuasi yang tinggi."
+    );
+  }
+
+  if (experience === 1) {
+    reasons.push(
+      "Pengalaman investasi masih di tahap pemula (deposito, emas, atau RDPU), sehingga instrumen yang mudah dipahami lebih diutamakan."
+    );
+  } else if (experience === 2) {
+    reasons.push(
+      "Anda sudah mengenal saham blue chip atau obligasi, sehingga siap mengelola kombinasi aset pasar modal."
+    );
+  } else {
+    reasons.push(
+      "Anda sudah memahami laporan keuangan dan siklus pasar, mendukung pengelolaan porsi aset agresif."
     );
   }
 
   return reasons;
+}
+
+function lowerFirstUnlessPronoun(text: string): string {
+  if (text.startsWith("Anda ")) return text;
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+function buildProfileRationale(
+  profile: RiskProfileType,
+  macroLabel: string,
+  reasons: string[]
+): string {
+  const clauses = reasons.map((reason) => {
+    const firstClause = reason.split(",")[0].replace(/\.$/, "").trim();
+    return lowerFirstUnlessPronoun(firstClause);
+  });
+  if (clauses.length <= 1) {
+    return `Profil ${profile} direkomendasikan karena ${clauses[0] ?? "jawaban kuesioner Anda"} pada asumsi "${macroLabel}".`;
+  }
+  return `Profil ${profile} direkomendasikan karena ${clauses.slice(0, -1).join("; ")}; serta ${clauses[clauses.length - 1]} (asumsi siklus: "${macroLabel}").`;
 }
 
 /**
@@ -416,9 +465,8 @@ export function generateRecommendation(
   const expectedAnnualReturn = `Skenario ilustratif: Buruk ${formatSignedPercent(scenarios.badPct)} · Dasar ${formatSignedPercent(scenarios.basePct)} · Baik ${formatSignedPercent(scenarios.goodPct)} / tahun`;
   const maxHistoricalDrawdown = `Sekitar ${worstCaseDrawdownPct}% (ilustratif)`;
 
-  const rationale = `Berdasarkan skor risiko Anda (${totalScore}/15), profil Anda adalah ${profile}. Dalam rezim ekonomi "${macro.label}", mesin alokasi melakukan penyesuaian taktis untuk mengoptimalkan imbal hasil sekaligus menjaga ketahanan modal.`;
-
   const reasons = buildProfileReasons(profile, totalScore, answers);
+  const rationale = buildProfileRationale(profile, macro.label, reasons);
 
   const tacticalActions: string[] = [
     ...(answers?.emergency_fund === 1

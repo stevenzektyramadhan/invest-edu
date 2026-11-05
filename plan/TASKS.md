@@ -288,8 +288,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Tampilkan daftar `reasons` dalam bahasa awam, contoh: "Horizon investasi Anda > 5 tahun, sehingga porsi saham bisa lebih besar" atau "Dana darurat belum ada, jadi prioritas pertama adalah membangunnya."
 2. Ganti `rationale` template dengan ringkasan satu kalimat yang merujuk `reasons`.
 **Acceptance criteria**:
-- [ ] Dua pengguna dengan jawaban berbeda melihat alasan yang berbeda.
-- [ ] Aturan keras dari Task 1.1 selalu muncul di daftar alasan.
+- [x] Dua pengguna dengan jawaban berbeda melihat alasan yang berbeda.
+- [x] Aturan keras dari Task 1.1 selalu muncul di daftar alasan.
 
 ### Task 3.4 — Konsistensi teks rekomendasi
 **Tujuan**: Teks statis bisa bertentangan dengan angka yang dihitung.
@@ -482,7 +482,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 2.6 — Hapus akun + privasi | ✅ Done | Action `delete-account` transaksional (`user_state`, `sessions`, `users`), dialog konfirmasi password di `Navbar`, halaman `/privasi` & link footer (`TODO(owner)` draf) |
 | 3.1 — Rezim makro opsional | ✅ Done | Selector rezim makro dipindah ke bagian `<details>` "Mode lanjutan" (collapsed default `"netral"`) dengan catatan edukasi |
 | 3.2 — Skenario & worst-case rupiah | ✅ Done | Skenario buruk/dasar/baik, `ASSET_SCENARIO_ASSUMPTIONS` (`source`/`period` bertanda `TODO(owner)`), & penurunan terburuk dalam Rupiah |
-| 3.3 — Rasional personal | ⏳ Pending | Dependency 1.1 |
+| 3.3 — Rasional personal | ✅ Done | Daftar `reasons` bahasa awam per jawaban kuesioner & `rationale` satu kalimat yang merujuk `reasons` |
 | 3.4 — Konsistensi teks | ⏳ Pending | |
 | 3.5 — Audit regulator | ⏳ Pending | Menunggu verifikasi pemilik |
 | 4.1 — Modul fondasi | ⏳ Pending | Konten butuh review pemilik |
