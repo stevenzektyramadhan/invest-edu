@@ -232,9 +232,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 3. Setelah tidak ada pelanggaran di `bun run dev` dan `bun run build && bun run start`, ubah ke mode enforce.
 4. Tambahkan `Strict-Transport-Security` hanya untuk produksi.
 **Acceptance criteria**:
-- [ ] Semua halaman, chart TradingView, dan chart `lightweight-charts` tetap tampil di dev dan prod build.
-- [ ] Tidak ada hydration mismatch baru (lihat peringatan di `AGENTS.md`).
-- [ ] Header CSP dan HSTS terlihat di respons produksi.
+- [x] Semua halaman, chart TradingView, dan chart `lightweight-charts` tetap tampil di dev dan prod build.
+- [x] Tidak ada hydration mismatch baru (lihat peringatan di `AGENTS.md`).
+- [x] Header CSP dan HSTS terlihat di respons produksi.
 **Catatan**: Jangan mengaktifkan `cacheComponents`/`partialPrefetching` (dilarang di `AGENTS.md`).
 
 ### Task 2.6 — Privasi: hapus akun dan halaman kebijakan privasi
@@ -478,7 +478,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 2.2 — Async scrypt + password min 8 | ✅ Done | `promisify(scrypt)`, `DUMMY_PASSWORD_HASH` untuk timing login setara, `MIN_PASSWORD_LENGTH = 8` hanya pada register (akun lama 6–7 karakter tetap bisa login) |
 | 2.3 — Hardening session | ✅ Done | Simpan `sha256(token)` di `sessions.token`, bersihkan session kedaluwarsa saat `createSession`, tambah index `user_id` & `expires_at` |
 | 2.4 — Atomic merge user state | ✅ Done | Transaksi `db.transaction("write")` di `saveUserStateToDb` dengan union `completedModules` |
-| 2.5 — CSP + HSTS | ⏳ Pending | Mulai Report-Only |
+| 2.5 — CSP + HSTS | ✅ Done | Header `Content-Security-Policy` (tanpa `'unsafe-eval'` di prod, mengizinkan frame TradingView) & `Strict-Transport-Security` di prod |
 | 2.6 — Hapus akun + privasi | ⏳ Pending | Teks privasi = draf |
 | 3.1 — Rezim makro opsional | ⏳ Pending | |
 | 3.2 — Skenario & worst-case rupiah | ⏳ Pending | Angka wajib bersumber |
