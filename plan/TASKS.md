@@ -245,9 +245,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Tambahkan tombol "Hapus akun" dengan dialog konfirmasi.
 3. Buat halaman `/privasi` berisi: data yang disimpan, tujuan, lokasi penyimpanan, cara hapus akun, kontak. Tautkan dari footer.
 **Acceptance criteria**:
-- [ ] Setelah hapus akun, tidak ada baris tersisa untuk `user_id` tersebut di `users`, `sessions`, `user_state`.
-- [ ] Action tanpa sesi valid atau dengan password salah ditolak.
-- [ ] `/privasi` bisa diakses tanpa login.
+- [x] Setelah hapus akun, tidak ada baris tersisa untuk `user_id` tersebut di `users`, `sessions`, `user_state`.
+- [x] Action tanpa sesi valid atau dengan password salah ditolak.
+- [x] `/privasi` bisa diakses tanpa login.
 **Catatan**: Teks kebijakan privasi hanyalah draf — tandai `TODO(owner)` agar ditinjau pemilik (dan ahli hukum bila aplikasi dipublikasikan luas).
 
 ---
@@ -479,7 +479,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 2.3 — Hardening session | ✅ Done | Simpan `sha256(token)` di `sessions.token`, bersihkan session kedaluwarsa saat `createSession`, tambah index `user_id` & `expires_at` |
 | 2.4 — Atomic merge user state | ✅ Done | Transaksi `db.transaction("write")` di `saveUserStateToDb` dengan union `completedModules` |
 | 2.5 — CSP + HSTS | ✅ Done | Header `Content-Security-Policy` (tanpa `'unsafe-eval'` di prod, mengizinkan frame TradingView) & `Strict-Transport-Security` di prod |
-| 2.6 — Hapus akun + privasi | ⏳ Pending | Teks privasi = draf |
+| 2.6 — Hapus akun + privasi | ✅ Done | Action `delete-account` transaksional (`user_state`, `sessions`, `users`), dialog konfirmasi password di `Navbar`, halaman `/privasi` & link footer (`TODO(owner)` draf) |
 | 3.1 — Rezim makro opsional | ⏳ Pending | |
 | 3.2 — Skenario & worst-case rupiah | ⏳ Pending | Angka wajib bersumber |
 | 3.3 — Rasional personal | ⏳ Pending | Dependency 1.1 |

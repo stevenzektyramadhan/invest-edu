@@ -7,10 +7,12 @@ import {
   SESSION_COOKIE_NAME,
   SESSION_TTL_MS,
   checkAuthAttemptRateLimit,
+  checkAuthRateLimit,
   clearAuthRateLimit,
   createSession,
   createUser,
   deleteSession,
+  deleteUserAccount,
   getUserByEmail,
   getUserBySessionToken,
   getUserStateFromDb,
@@ -24,7 +26,7 @@ import {
 } from "@/lib/auth";
 import { isTursoCloud } from "@/lib/db";
 
-type AuthAction = "register" | "login" | "logout";
+type AuthAction = "register" | "login" | "logout" | "delete-account";
 
 interface AuthRequestBody {
   action: AuthAction;
@@ -43,7 +45,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function parseAuthRequest(input: unknown): AuthRequestBody | null {
   if (!isRecord(input)) return null;
   const action = input["action"];
-  if (action !== "register" && action !== "login" && action !== "logout") {
+  if (
+    action !== "register" &&
+    action !== "login" &&
+    action !== "logout" &&
+    action !== "delete-account"
+  ) {
     return null;
   }
 
@@ -229,6 +236,57 @@ export async function POST(request: Request) {
         storageMode: isTursoCloud() ? "turso-cloud" : "turso-local",
       });
       setSessionCookie(response, await createSession(user.id));
+      return response;
+    }
+    case "delete-account": {
+      const clientIp = getClientIp(request);
+      const rate = await checkAuthRateLimit(`ip:${clientIp}`);
+      if (!rate.allowed) {
+        return NextResponse.json(
+          { error: "Terlalu banyak percobaan. Silakan tunggu sebentar." },
+          {
+            status: 429,
+            headers: { "Retry-After": String(rate.retryAfterSeconds) },
+          }
+        );
+      }
+
+      const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+      const sessionUser = await getUserBySessionToken(token);
+      if (!sessionUser) {
+        return NextResponse.json(
+          { error: "Sesi tidak valid. Silakan masuk kembali." },
+          { status: 401 }
+        );
+      }
+
+      const password = body.password ?? "";
+      if (password.length < 1 || password.length > MAX_PASSWORD_LENGTH) {
+        return invalidRequest("Konfirmasi password diperlukan.");
+      }
+
+      const deleted = await deleteUserAccount(sessionUser.id, password);
+      if (!deleted) {
+        return NextResponse.json(
+          { error: "Password salah. Penghapusan akun dibatalkan." },
+          { status: 401 }
+        );
+      }
+
+      await clearAuthRateLimit(`email:${sessionUser.email}`);
+
+      const response = NextResponse.json({
+        ok: true,
+        user: null,
+        storageMode: isTursoCloud() ? "turso-cloud" : "turso-local",
+      });
+      response.cookies.set(SESSION_COOKIE_NAME, "", {
+        httpOnly: true,
+        maxAge: 0,
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
       return response;
     }
   }

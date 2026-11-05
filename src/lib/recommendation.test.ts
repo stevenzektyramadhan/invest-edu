@@ -10,6 +10,7 @@ import {
   createSession,
   createUser,
   deleteSession,
+  deleteUserAccount,
   getUserBySessionToken,
   getUserStateFromDb,
   hashPassword,
@@ -315,14 +316,40 @@ assert.equal(
   true
 );
 
-await getDb().execute({
-  sql: "DELETE FROM user_state WHERE user_id = ?",
+const deleteAccountSessionToken = await createSession(
+  sessionUser.id,
+  rateLimitNow
+);
+assert.equal(
+  await deleteUserAccount(sessionUser.id, "wrong-password-123"),
+  false
+);
+assert.equal(await deleteUserAccount("nonexistent-user-id", "rahasia-aman"), false);
+assert.deepEqual(
+  await getUserBySessionToken(deleteAccountSessionToken, rateLimitNow),
+  sessionUser
+);
+
+assert.equal(await deleteUserAccount(sessionUser.id, "rahasia-aman"), true);
+assert.equal(
+  await getUserBySessionToken(deleteAccountSessionToken, rateLimitNow),
+  null
+);
+const remainingUsers = await getDb().execute({
+  sql: "SELECT id FROM users WHERE id = ?",
   args: [sessionUser.id],
 });
-await getDb().execute({
-  sql: "DELETE FROM users WHERE id = ?",
+assert.equal(remainingUsers.rows.length, 0);
+const remainingSessions = await getDb().execute({
+  sql: "SELECT token FROM sessions WHERE user_id = ?",
   args: [sessionUser.id],
 });
+assert.equal(remainingSessions.rows.length, 0);
+const remainingUserState = await getDb().execute({
+  sql: "SELECT user_id FROM user_state WHERE user_id = ?",
+  args: [sessionUser.id],
+});
+assert.equal(remainingUserState.rows.length, 0);
 
 const sanitizedState = sanitizeUserState({
   completedModules: ["reksadana-dasar", 42, "reksadana-dasar"],

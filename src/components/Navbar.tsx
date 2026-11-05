@@ -12,6 +12,7 @@ import {
   Home,
   LogOut,
   ShieldCheck,
+  Trash2,
   TrendingUp,
   User,
   X,
@@ -51,6 +52,10 @@ export default function Navbar() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -112,6 +117,35 @@ export default function Navbar() {
     setStorageMode("turso-local");
   };
 
+  const submitDeleteAccount = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setDeleteError("");
+    setIsDeleting(true);
+    try {
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "delete-account",
+          password: deletePassword,
+        }),
+      });
+      const data = (await response.json()) as AuthResponse;
+      if (!response.ok) {
+        setDeleteError(data.error ?? "Gagal menghapus akun. Silakan coba lagi.");
+        return;
+      }
+      setUser(null);
+      setStorageMode("turso-local");
+      setIsDeleteOpen(false);
+      setDeletePassword("");
+    } catch {
+      setDeleteError("Tidak dapat terhubung ke layanan akun.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-neutral-800/80 bg-background/90 backdrop-blur-md">
@@ -165,8 +199,8 @@ export default function Navbar() {
             </Link>
 
             {user ? (
-              <div className="hidden items-center gap-2 sm:flex">
-                <div className="flex items-center gap-2 rounded-md border border-neutral-800 bg-neutral-900/90 px-2.5 py-1.5 text-xs text-neutral-200">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="hidden items-center gap-2 rounded-md border border-neutral-800 bg-neutral-900/90 px-2.5 py-1.5 text-xs text-neutral-200 sm:flex">
                   <span className="font-medium">{user.name}</span>
                   <span className="inline-flex items-center gap-1 rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
@@ -179,7 +213,19 @@ export default function Navbar() {
                   className="inline-flex items-center gap-1 rounded-md border border-neutral-800 bg-neutral-900/60 px-2.5 py-1.5 text-xs font-medium text-neutral-400 hover:border-neutral-700 hover:text-white transition-colors"
                 >
                   <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-                  Keluar
+                  <span className="hidden sm:inline">Keluar</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteError("");
+                    setDeletePassword("");
+                    setIsDeleteOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/10 px-2.5 py-1.5 text-xs font-medium text-rose-300 hover:border-rose-500/50 hover:bg-rose-500/20 hover:text-rose-200 transition-colors"
+                >
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Hapus akun</span>
                 </button>
               </div>
             ) : (
@@ -209,6 +255,62 @@ export default function Navbar() {
           <div className="mt-4 grid grid-cols-2 rounded-lg bg-neutral-900 p-1"><button type="button" onClick={() => { setMode("login"); setError(""); }} className={`rounded-md px-3 py-2 text-xs font-semibold ${mode === "login" ? "bg-neutral-100 text-neutral-950" : "text-neutral-400"}`}>Masuk</button><button type="button" onClick={() => { setMode("register"); setError(""); }} className={`rounded-md px-3 py-2 text-xs font-semibold ${mode === "register" ? "bg-neutral-100 text-neutral-950" : "text-neutral-400"}`}>Daftar Akun</button></div>
           <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs leading-relaxed text-emerald-200">Data progres modul, profil risiko, dan alarm harga Anda disinkronkan otomatis ke database Turso (multi-device &amp; multi-user).</div>
           <form onSubmit={submitAuth} className="mt-5 space-y-3">{mode === "register" && <label className="block text-xs font-medium text-slate-300">Nama Lengkap<input required maxLength={100} value={name} onChange={(event) => setName(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-sky-500" /></label>}<label className="block text-xs font-medium text-slate-300">Email<input required maxLength={254} type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-sky-500" /></label><label className="block text-xs font-medium text-slate-300">Password<input required minLength={mode === "register" ? 8 : 1} maxLength={128} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-sky-500" />{mode === "register" && <span className="mt-1 block text-[11px] text-slate-500">Minimal 8 karakter</span>}</label>{error && <div role="alert" className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-200"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}<button disabled={isSubmitting} type="submit" className="w-full rounded-lg bg-sky-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-sky-400 disabled:cursor-wait disabled:opacity-60">{isSubmitting ? "Memproses..." : mode === "login" ? "Masuk" : "Daftar dan Sinkronkan"}</button></form>
+        </section>
+      </div>}
+
+      {isDeleteOpen && user && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setIsDeleteOpen(false); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="delete-account-title" className="w-full max-w-md rounded-2xl border border-neutral-800 bg-panel p-5 shadow-2xl sm:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-rose-300">
+                <Trash2 className="h-4 w-4" />
+                <span className="text-xs font-medium">Konfirmasi Penghapusan</span>
+              </div>
+              <h2 id="delete-account-title" className="mt-1 text-xl font-bold text-white">Hapus Akun Permanen</h2>
+            </div>
+            <button type="button" onClick={() => setIsDeleteOpen(false)} aria-label="Tutup modal" className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-white">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="mt-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs leading-relaxed text-rose-200">
+            Seluruh data akun <strong>{user.email}</strong> di server (profil pengguna, sesi login, progres modul, profil risiko, dan alarm harga) akan dihapus secara permanen dan tidak dapat dipulihkan.
+          </div>
+          <form onSubmit={submitDeleteAccount} className="mt-4 space-y-3">
+            <label className="block text-xs font-medium text-slate-300">
+              Masukkan Password untuk Konfirmasi
+              <input
+                required
+                minLength={1}
+                maxLength={128}
+                type="password"
+                value={deletePassword}
+                onChange={(event) => setDeletePassword(event.target.value)}
+                className="mt-1.5 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-rose-500"
+              />
+            </label>
+            {deleteError && (
+              <div role="alert" className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-200">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                {deleteError}
+              </div>
+            )}
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setIsDeleteOpen(false)}
+                className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-2 text-xs font-semibold text-neutral-300 hover:bg-neutral-800 hover:text-white"
+              >
+                Batal
+              </button>
+              <button
+                disabled={isDeleting}
+                type="submit"
+                className="rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-rose-500 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isDeleting ? "Menghapus..." : "Hapus Akun Permanen"}
+              </button>
+            </div>
+          </form>
         </section>
       </div>}
     </>

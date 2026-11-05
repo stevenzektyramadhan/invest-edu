@@ -304,6 +304,47 @@ export async function deleteSession(token: string): Promise<void> {
   });
 }
 
+export async function deleteUserAccount(
+  userId: string,
+  password: string
+): Promise<boolean> {
+  await ensureSchema();
+  const result = await getDb().execute({
+    sql: "SELECT id, email, name, password_hash FROM users WHERE id = ? LIMIT 1",
+    args: [userId],
+  });
+  const user = readAuthUser(result.rows[0]);
+  const passwordHash = readString(result.rows[0], "password_hash");
+  const passwordValid = await verifyPassword(
+    password,
+    user && passwordHash !== null ? passwordHash : DUMMY_PASSWORD_HASH
+  );
+  if (!user || !passwordValid) return false;
+
+  const tx = await getDb().transaction("write");
+  try {
+    await tx.execute({
+      sql: "DELETE FROM user_state WHERE user_id = ?",
+      args: [userId],
+    });
+    await tx.execute({
+      sql: "DELETE FROM sessions WHERE user_id = ?",
+      args: [userId],
+    });
+    await tx.execute({
+      sql: "DELETE FROM users WHERE id = ?",
+      args: [userId],
+    });
+    await tx.commit();
+    return true;
+  } catch (error) {
+    await tx.rollback().catch(() => undefined);
+    throw error;
+  } finally {
+    tx.close();
+  }
+}
+
 export async function getUserBySessionToken(
   token: string | undefined,
   now = Date.now()

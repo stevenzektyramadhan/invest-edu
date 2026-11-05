@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -55,11 +56,19 @@ export default function RootLayout({
           {children}
         </main>
         <footer className="border-t border-neutral-900 py-6 text-center text-xs text-neutral-500">
-          <div className="mx-auto max-w-6xl px-4">
+          <div className="mx-auto max-w-6xl space-y-2 px-4">
             <p>
               InvestEdu PWA: Aplikasi Edukasi & Simulasi Alokasi Aset. Bukan
               ajakan jual/beli instrumen keuangan. Keputusan investasi sepenuhnya
               tanggung jawab pengguna.
+            </p>
+            <p>
+              <Link
+                href="/privasi"
+                className="text-neutral-400 underline underline-offset-4 hover:text-neutral-200"
+              >
+                Kebijakan Privasi &amp; Pengelolaan Data
+              </Link>
             </p>
           </div>
         </footer>
