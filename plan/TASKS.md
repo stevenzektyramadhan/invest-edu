@@ -146,8 +146,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
    return schemaPromise;
    ```
 **Acceptance criteria**:
-- [ ] Setelah `batch` gagal sekali, panggilan `ensureSchema()` berikutnya mencoba lagi.
-- [ ] Perilaku normal (sukses) tidak berubah.
+- [x] Setelah `batch` gagal sekali, panggilan `ensureSchema()` berikutnya mencoba lagi.
+- [x] Perilaku normal (sukses) tidak berubah.
 
 ### Task 1.6 — Alarm harga yang jujur
 **Tujuan**: Nama "alarm" menjanjikan pemberitahuan di latar belakang, padahal pengecekan hanya terjadi saat halaman `/market` terbuka (setahu reviewer tidak ada polling — verifikasi dulu).
@@ -472,7 +472,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 1.2 — Label chart sintetis, TradingView default | ✅ Done | Default `TV_LIVE`, badge "Ilustrasi — bukan data pasar", sembunyikan TV di `rdpu-index`, catatan `gold-idr` & fallback IDX |
 | 1.3 — Status data per item | ✅ Done | `dataStatus` ("live" \| "static"), `asOf` (`STATIC_SNAPSHOT_AS_OF = "TODO(owner)"`), fallback cache 10s, pill per item & label makro statis |
 | 1.4 — Hapus support/resistance palsu | ✅ Done | Hapus `supportLevel`/`resistanceLevel` di seluruh `src/`, ganti dengan Terendah/Tertinggi 7 hari dari `sparkline` |
-| 1.5 — Fix `ensureSchema` | ⏳ Pending | |
+| 1.5 — Fix `ensureSchema` | ✅ Done | Reset `schemaPromise = undefined` di `.catch(...)` saat inisialisasi DB gagal |
 | 1.6 — Alarm harga jujur | ⏳ Pending | |
 | 2.1 — Rate limit persisten | ⏳ Pending | Konfirmasi platform deploy |
 | 2.2 — Async scrypt + password min 8 | ⏳ Pending | Jangan kunci akun lama |

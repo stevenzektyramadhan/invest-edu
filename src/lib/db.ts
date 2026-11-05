@@ -47,6 +47,10 @@ export function ensureSchema(): Promise<void> {
   // ponytail: additive DDL is enough for the initial schema; add versioned migrations when a change needs data transforms.
   schemaPromise ??= getDb()
     .batch([...SCHEMA_STATEMENTS], "write")
-    .then(() => undefined);
+    .then(() => undefined)
+    .catch((error) => {
+      schemaPromise = undefined;
+      throw error;
+    });
   return schemaPromise;
 }
