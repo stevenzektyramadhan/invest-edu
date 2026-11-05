@@ -11,11 +11,13 @@ import {
   createUser,
   deleteSession,
   getUserBySessionToken,
+  getUserStateFromDb,
   hashPassword,
   hashSessionToken,
   mergeUserStates,
   resetAuthRateLimitForTests,
   sanitizeUserState,
+  saveUserStateToDb,
   verifyPassword,
 } from "./auth";
 import { getDb } from "./db";
@@ -294,6 +296,29 @@ assert.deepEqual(resolvedSessionUser, sessionUser);
 
 await deleteSession(activeToken);
 assert.equal(await getUserBySessionToken(activeToken, rateLimitNow), null);
+
+await getDb().execute({
+  sql: "DELETE FROM user_state WHERE user_id = ?",
+  args: [sessionUser.id],
+});
+await Promise.all([
+  saveUserStateToDb(sessionUser.id, { completedModules: ["reksadana-dasar"] }),
+  saveUserStateToDb(sessionUser.id, { completedModules: ["emas-safe-haven"] }),
+]);
+const stateAfterConcurrentSaves = await getUserStateFromDb(sessionUser.id);
+assert.equal(
+  stateAfterConcurrentSaves.completedModules.includes("reksadana-dasar"),
+  true
+);
+assert.equal(
+  stateAfterConcurrentSaves.completedModules.includes("emas-safe-haven"),
+  true
+);
+
+await getDb().execute({
+  sql: "DELETE FROM user_state WHERE user_id = ?",
+  args: [sessionUser.id],
+});
 await getDb().execute({
   sql: "DELETE FROM users WHERE id = ?",
   args: [sessionUser.id],

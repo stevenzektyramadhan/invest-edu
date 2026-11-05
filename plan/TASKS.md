@@ -220,8 +220,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 3. Jika pernah: pakai optimistic concurrency — klien mengirim `baseUpdatedAt`, server membalas 409 bila berbeda, klien fetch ulang lalu merge.
 4. `riskState` dan `priceAlarms` boleh last-write-wins dengan `updatedAt`.
 **Acceptance criteria**:
-- [ ] Dua PUT bersamaan yang menambahkan modul berbeda → keduanya tersimpan.
-- [ ] Alur login merge (`mergeUserStates`) tetap berjalan.
+- [x] Dua PUT bersamaan yang menambahkan modul berbeda → keduanya tersimpan.
+- [x] Alur login merge (`mergeUserStates`) tetap berjalan.
 
 ### Task 2.5 — Security headers: CSP dan HSTS
 **Tujuan**: `next.config.ts` baru punya header dasar. Tambahkan CSP untuk membatasi dampak XSS dan HSTS untuk produksi.
@@ -477,7 +477,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 2.1 — Rate limit persisten | ✅ Done | Tabel `rate_limits` di Turso, pisah limit per-IP (20/mnt) & per-email (5/15mnt), header IP `x-vercel-forwarded-for`/`x-real-ip` (`TODO(owner)`) |
 | 2.2 — Async scrypt + password min 8 | ✅ Done | `promisify(scrypt)`, `DUMMY_PASSWORD_HASH` untuk timing login setara, `MIN_PASSWORD_LENGTH = 8` hanya pada register (akun lama 6–7 karakter tetap bisa login) |
 | 2.3 — Hardening session | ✅ Done | Simpan `sha256(token)` di `sessions.token`, bersihkan session kedaluwarsa saat `createSession`, tambah index `user_id` & `expires_at` |
-| 2.4 — Atomic merge user state | ⏳ Pending | |
+| 2.4 — Atomic merge user state | ✅ Done | Transaksi `db.transaction("write")` di `saveUserStateToDb` dengan union `completedModules` |
 | 2.5 — CSP + HSTS | ⏳ Pending | Mulai Report-Only |
 | 2.6 — Hapus akun + privasi | ⏳ Pending | Teks privasi = draf |
 | 3.1 — Rezim makro opsional | ⏳ Pending | |

@@ -345,38 +345,74 @@ export async function saveUserStateToDb(
   userId: string,
   partial: Partial<UserStatePayload>
 ): Promise<UserStatePayload> {
-  const current = await getUserStateFromDb(userId);
+  await ensureSchema();
   const incoming = sanitizeUserState(partial);
   const updatedAt = new Date().toISOString();
-  const state: UserStatePayload & { updatedAt: string } = {
-    completedModules:
+  const tx = await getDb().transaction("write");
+  try {
+    const result = await tx.execute({
+      sql: "SELECT completed_modules, risk_state, price_alarms, updated_at FROM user_state WHERE user_id = ? LIMIT 1",
+      args: [userId],
+    });
+    const row = result.rows[0];
+    const current = row
+      ? sanitizeUserState({
+          completedModules: parseStoredJson(
+            readString(row, "completed_modules")
+          ),
+          riskState: parseStoredJson(readString(row, "risk_state")),
+          priceAlarms: parseStoredJson(readString(row, "price_alarms")),
+          updatedAt: readString(row, "updated_at"),
+        })
+      : emptyUserState();
+
+    const mergedModules =
       partial.completedModules === undefined
         ? current.completedModules
-        : incoming.completedModules,
-    riskState:
-      partial.riskState === undefined ? current.riskState : incoming.riskState,
-    priceAlarms:
-      partial.priceAlarms === undefined
-        ? current.priceAlarms
-        : incoming.priceAlarms,
-    updatedAt,
-  };
+        : sanitizeUserState({
+            completedModules: [
+              ...new Set([
+                ...current.completedModules,
+                ...incoming.completedModules,
+              ]),
+            ],
+          }).completedModules;
 
-  await getDb().execute({
-    sql: `INSERT INTO user_state (user_id, completed_modules, risk_state, price_alarms, updated_at)
-      VALUES (?, ?, ?, ?, ?)
-      ON CONFLICT(user_id) DO UPDATE SET
-        completed_modules = excluded.completed_modules,
-        risk_state = excluded.risk_state,
-        price_alarms = excluded.price_alarms,
-        updated_at = excluded.updated_at`,
-    args: [
-      userId,
-      serialize(state.completedModules),
-      serialize(state.riskState),
-      serialize(state.priceAlarms),
-      state.updatedAt,
-    ],
-  });
-  return state;
+    const state: UserStatePayload & { updatedAt: string } = {
+      completedModules: mergedModules,
+      riskState:
+        partial.riskState === undefined
+          ? current.riskState
+          : incoming.riskState,
+      priceAlarms:
+        partial.priceAlarms === undefined
+          ? current.priceAlarms
+          : incoming.priceAlarms,
+      updatedAt,
+    };
+
+    await tx.execute({
+      sql: `INSERT INTO user_state (user_id, completed_modules, risk_state, price_alarms, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET
+          completed_modules = excluded.completed_modules,
+          risk_state = excluded.risk_state,
+          price_alarms = excluded.price_alarms,
+          updated_at = excluded.updated_at`,
+      args: [
+        userId,
+        serialize(state.completedModules),
+        serialize(state.riskState),
+        serialize(state.priceAlarms),
+        state.updatedAt,
+      ],
+    });
+    await tx.commit();
+    return state;
+  } catch (error) {
+    await tx.rollback().catch(() => undefined);
+    throw error;
+  } finally {
+    tx.close();
+  }
 }
