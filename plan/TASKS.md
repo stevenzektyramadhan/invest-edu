@@ -157,9 +157,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Tambahkan teks di panel alarm: "Alarm hanya aktif selama halaman ini terbuka."
 3. Jangan mengubah `evaluateAlarms` (dites).
 **Acceptance criteria**:
-- [ ] Tidak ada interval yang bocor setelah pindah halaman (cleanup berjalan).
-- [ ] Teks keterbatasan alarm terlihat di UI.
-- [ ] Tidak ada fetch beruntun saat tab tidak terlihat.
+- [x] Tidak ada interval yang bocor setelah pindah halaman (cleanup berjalan).
+- [x] Teks keterbatasan alarm terlihat di UI.
+- [x] Tidak ada fetch beruntun saat tab tidak terlihat.
 **Catatan**: Notifikasi push sungguhan butuh service worker yang proper — lihat Fase 6.
 
 ---
@@ -473,7 +473,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 1.3 — Status data per item | ✅ Done | `dataStatus` ("live" \| "static"), `asOf` (`STATIC_SNAPSHOT_AS_OF = "TODO(owner)"`), fallback cache 10s, pill per item & label makro statis |
 | 1.4 — Hapus support/resistance palsu | ✅ Done | Hapus `supportLevel`/`resistanceLevel` di seluruh `src/`, ganti dengan Terendah/Tertinggi 7 hari dari `sparkline` |
 | 1.5 — Fix `ensureSchema` | ✅ Done | Reset `schemaPromise = undefined` di `.catch(...)` saat inisialisasi DB gagal |
-| 1.6 — Alarm harga jujur | ⏳ Pending | |
+| 1.6 — Alarm harga jujur | ✅ Done | Polling 60s saat `document.visibilityState === "visible"` + keterangan "Alarm hanya aktif selama halaman ini terbuka." |
 | 2.1 — Rate limit persisten | ⏳ Pending | Konfirmasi platform deploy |
 | 2.2 — Async scrypt + password min 8 | ⏳ Pending | Jangan kunci akun lama |
 | 2.3 — Hardening session | ⏳ Pending | Session lama jadi tidak valid |

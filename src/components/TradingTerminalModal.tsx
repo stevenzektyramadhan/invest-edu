@@ -758,6 +758,9 @@ export default function TradingTerminalModal({
                     Mode Alarm Target Harga
                   </h3>
                 </div>
+                <p className="rounded border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-200">
+                  Alarm hanya aktif selama halaman ini terbuka.
+                </p>
 
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-400 mb-1.5">

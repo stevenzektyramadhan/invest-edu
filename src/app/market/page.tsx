@@ -237,7 +237,15 @@ export default function MarketDashboardPage() {
 
   useEffect(() => {
     const fetchTimer = window.setTimeout(() => void fetchMarket(), 0);
-    return () => window.clearTimeout(fetchTimer);
+    const pollInterval = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        void fetchMarket();
+      }
+    }, 60_000);
+    return () => {
+      window.clearTimeout(fetchTimer);
+      window.clearInterval(pollInterval);
+    };
   }, [fetchMarket]);
 
   const handleAddAlarm = (
@@ -436,6 +444,9 @@ export default function MarketDashboardPage() {
               <p className="text-xs text-neutral-400">
                 Pasang target harga beli saat diskon (Buy the Dip) atau target
                 ambil untung pada aset pilihan Anda.
+              </p>
+              <p className="mt-1 text-[11px] font-medium text-amber-300">
+                Alarm hanya aktif selama halaman ini terbuka.
               </p>
             </div>
           </div>
