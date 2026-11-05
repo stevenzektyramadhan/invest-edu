@@ -467,6 +467,12 @@ export function generateRecommendation(
 
   const reasons = buildProfileReasons(profile, totalScore, answers);
   const rationale = buildProfileRationale(profile, macro.label, reasons);
+  const stablePct = allocation.reksaDanaPasarUangObligasi + allocation.emas;
+  const growthPct = allocation.saham + allocation.kripto;
+  const growthDetail =
+    allocation.kripto > 0
+      ? `Saham ${allocation.saham}% + Kripto ${allocation.kripto}%`
+      : `Saham ${allocation.saham}%`;
 
   const tacticalActions: string[] = [
     ...(answers?.emergency_fund === 1
@@ -475,10 +481,10 @@ export function generateRecommendation(
         ]
       : []),
     profile === "Konservatif"
-      ? "Prioritaskan keamanan modal pokok pada Reksa Dana Pasar Uang (RDPU), SBN Ritel (ORI/SR/ST), dan Emas."
+      ? `Prioritaskan keamanan modal pokok dengan ${stablePct}% aset stabil (RDPU/Obligasi ${allocation.reksaDanaPasarUangObligasi}% + Emas ${allocation.emas}%) dan ${growthPct}% aset pertumbuhan (${growthDetail}).`
       : profile === "Moderat"
-      ? "Gunakan strategi Core-Satellite: 60% aset stabil (RDPT/Emas) dan 40% aset pertumbuhan (Saham Blue Chip & Bitcoin)."
-      : "Fokus pada akumulasi bertahap (DCA) di Saham berfundamental kuat dan Bitcoin, sambil tetap menyisihkan 15%–30% kas/emas untuk amunisi saat koreksi.",
+      ? `Gunakan strategi Core-Satellite: ${stablePct}% aset stabil (RDPU/Obligasi ${allocation.reksaDanaPasarUangObligasi}% + Emas ${allocation.emas}%) dan ${growthPct}% aset pertumbuhan (${growthDetail}).`
+      : `Fokus pada akumulasi bertahap (DCA) pada ${growthPct}% aset pertumbuhan (${growthDetail}), sambil tetap menyisihkan ${stablePct}% aset stabil (RDPU/Obligasi ${allocation.reksaDanaPasarUangObligasi}% + Emas ${allocation.emas}%) untuk penyangga saat koreksi.`,
     macroId === "ekspansi"
       ? "Kondisi suku bunga melandai mendukung peningkatan porsi Saham sensitif bunga (Perbankan/Teknologi) dan Reksa Dana Pendapatan Tetap."
       : macroId === "bunga_tinggi"
@@ -495,8 +501,8 @@ export function generateRecommendation(
       color: "#10b981", // emerald-500
       specificInstruments:
         profile === "Konservatif"
-          ? "RD Pasar Uang, SBN Ritel (SBR/ST), RD Pendapatan Tetap"
-          : "RD Pendapatan Tetap (Obligasi Negara/Korporasi) & Kas RDPU",
+          ? "Contoh kategori: RD Pasar Uang, SBN Ritel (SBR/ST), RD Pendapatan Tetap"
+          : "Contoh kategori: RD Pendapatan Tetap (Obligasi Negara/Korporasi) & Kas RDPU",
       roleInPortfolio: "Penjaga likuiditas, arus kas kupon stabil & peredam volatilitas",
     },
     {
@@ -512,8 +518,8 @@ export function generateRecommendation(
       color: "#0ea5e9", // sky-500
       specificInstruments:
         profile === "Konservatif"
-          ? "Reksa Dana Indeks IDX30 / Saham Big Banks Dividen"
-          : "Saham Blue Chip LQ45, Perbankan, Consumer & Sektor Komoditas",
+          ? "Contoh kategori: Reksa Dana Indeks IDX30 / Saham Big Banks Dividen"
+          : "Contoh kategori: Saham Blue Chip LQ45, Perbankan, Consumer & Sektor Komoditas",
       roleInPortfolio: "Mesin pertumbuhan modal jangka panjang (Capital Gain & Dividen)",
     },
     {
@@ -522,7 +528,7 @@ export function generateRecommendation(
       color: "#a855f7", // purple-500
       specificInstruments:
         allocation.kripto > 0
-          ? "Mayoritas Bitcoin (BTC) 80% + Ethereum (ETH) 20% (Tanpa Leverage)"
+          ? "Contoh ilustrasi pembagian (bukan instruksi beli): Bitcoin (BTC) 80% + Ethereum (ETH) 20% (Tanpa Leverage)"
           : "Tidak disarankan untuk profil risiko & kondisi makro saat ini",
       roleInPortfolio: "Akselerator imbal hasil asimetris dengan manajemen risiko ketat",
     },

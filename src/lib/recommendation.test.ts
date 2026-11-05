@@ -116,6 +116,23 @@ for (const baseLevel of [1, 2, 3]) {
         }
         assert.ok(rec.scenarios.badPct <= rec.scenarios.basePct);
         assert.ok(rec.scenarios.basePct <= rec.scenarios.goodPct);
+        assert.ok(!rec.rationale.toLowerCase().includes("mesin alokasi"));
+        assert.ok(!rec.rationale.toLowerCase().includes("mengoptimalkan imbal hasil"));
+        const stablePct = reksaDanaPasarUangObligasi + emas;
+        const growthPct = saham + kripto;
+        const joinedTactical = rec.tacticalActions.join(" ");
+        assert.ok(
+          joinedTactical.includes(`${stablePct}% aset stabil`) &&
+            joinedTactical.includes(`${growthPct}% aset pertumbuhan`),
+          `Expected tacticalActions to mention ${stablePct}% aset stabil and ${growthPct}% aset pertumbuhan`
+        );
+        const kriptoDetail = rec.instrumentDetails.find((d) => d.asset === "Aset Kripto");
+        if (kripto > 0) {
+          assert.ok(
+            kriptoDetail?.specificInstruments.toLowerCase().includes("contoh"),
+            "Expected kripto specificInstruments to include 'contoh'"
+          );
+        }
       }
     }
   }

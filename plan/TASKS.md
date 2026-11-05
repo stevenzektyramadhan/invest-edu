@@ -299,8 +299,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Pembagian "Bitcoin 80% + Ethereum 20%" diberi kata "contoh" dan penjelasan bahwa itu ilustrasi, bukan instruksi.
 3. Hapus istilah "mesin alokasi ... mengoptimalkan imbal hasil" dari teks pengguna.
 **Acceptance criteria**:
-- [ ] Persentase yang disebut di teks selalu sama dengan `allocation`.
-- [ ] Tidak ada nama produk/sekuritas spesifik yang diposisikan sebagai perintah beli.
+- [x] Persentase yang disebut di teks selalu sama dengan `allocation`.
+- [x] Tidak ada nama produk/sekuritas spesifik yang diposisikan sebagai perintah beli.
 
 ### Task 3.5 — Audit penyebutan regulator (Bappebti/OJK)
 **Tujuan**: Teks menyebut Bappebti untuk emas digital dan kripto. Setahu reviewer, pengawasan aset kripto dialihkan dari Bappebti ke OJK sejak Januari 2025; status regulator emas digital **belum diverifikasi** reviewer.
@@ -483,7 +483,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 3.1 — Rezim makro opsional | ✅ Done | Selector rezim makro dipindah ke bagian `<details>` "Mode lanjutan" (collapsed default `"netral"`) dengan catatan edukasi |
 | 3.2 — Skenario & worst-case rupiah | ✅ Done | Skenario buruk/dasar/baik, `ASSET_SCENARIO_ASSUMPTIONS` (`source`/`period` bertanda `TODO(owner)`), & penurunan terburuk dalam Rupiah |
 | 3.3 — Rasional personal | ✅ Done | Daftar `reasons` bahasa awam per jawaban kuesioner & `rationale` satu kalimat yang merujuk `reasons` |
-| 3.4 — Konsistensi teks | ⏳ Pending | |
+| 3.4 — Konsistensi teks | ✅ Done | Persentase `tacticalActions` dihitung dinamis dari `allocation`, label contoh ilustrasi pada BTC/ETH, tanpa klaim "mesin alokasi ... mengoptimalkan" |
 | 3.5 — Audit regulator | ⏳ Pending | Menunggu verifikasi pemilik |
 | 4.1 — Modul fondasi | ⏳ Pending | Konten butuh review pemilik |
 | 4.2 — Jalur belajar | ⏳ Pending | Dependency 4.1 |
