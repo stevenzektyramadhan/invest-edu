@@ -162,7 +162,13 @@ export default function EducationPage() {
     return EDUCATION_MODULES.filter((module) => {
       const matchesCategory = selectedCategory === "Semua" || module.category === selectedCategory;
       const matchesLevel = selectedLevel === "Semua" || module.level === selectedLevel;
-      const matchesSearch = [module.title, module.subTopic, module.summary, module.category]
+      const matchesSearch = [
+        module.plainTitle,
+        module.title,
+        module.subTopic,
+        module.summary,
+        module.category,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(normalizedSearch);
@@ -314,8 +320,11 @@ export default function EducationPage() {
                 </span>
               </div>
               <h2 className="text-lg font-bold text-white sm:text-xl">
-                {nextRecommendedModule.title}
+                {nextRecommendedModule.plainTitle}
               </h2>
+              <p className="text-xs font-medium text-neutral-400">
+                Topik teknis: {nextRecommendedModule.title}
+              </p>
               <p className="max-w-3xl text-xs leading-relaxed text-neutral-300 sm:text-sm">
                 {nextRecommendedModule.summary}
               </p>
@@ -507,8 +516,11 @@ export default function EducationPage() {
                 <span>{module.subTopic}</span>
               </div>
               <h3 className="mt-1.5 text-lg font-bold leading-snug text-white transition-colors group-hover:text-neutral-200">
-                {module.title}
+                {module.plainTitle}
               </h3>
+              <p className="mt-1 text-xs font-medium text-neutral-400">
+                {module.title}
+              </p>
               <p className="mt-2 text-xs leading-relaxed text-neutral-400">{module.summary}</p>
 
               {needsPrerequisiteNotice && (
@@ -579,8 +591,11 @@ export default function EducationPage() {
                   </div>
                   <div className="mt-2 text-xs font-semibold text-neutral-400">{activeModule.subTopic}</div>
                   <h2 id="education-dialog-title" className="mt-1 text-lg font-bold leading-snug text-white sm:text-xl">
-                    Modul #{activeModule.moduleNumber}: {activeModule.title}
+                    Modul #{activeModule.moduleNumber}: {activeModule.plainTitle}
                   </h2>
+                  <p className="mt-1 text-xs font-medium text-neutral-400">
+                    {activeModule.title}
+                  </p>
                 </div>
                 <button
                   type="button"

@@ -354,8 +354,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Tambahkan field `plainTitle: string` pada `EducationModule`; isi untuk **semua** modul dengan judul bahasa sehari-hari (contoh: "Cara membaca laporan reksa dana").
 2. Tampilkan `plainTitle` sebagai judul utama dan `title` teknis sebagai subjudul. Jangan menghapus/mengubah `title`.
 **Acceptance criteria**:
-- [ ] Semua modul memiliki `plainTitle` (dipastikan oleh tipe wajib).
-- [ ] Daftar modul menampilkan judul awam di atas, istilah teknis di bawah.
+- [x] Semua modul memiliki `plainTitle` (dipastikan oleh tipe wajib).
+- [x] Daftar modul menampilkan judul awam di atas, istilah teknis di bawah.
 
 ### Task 4.4 — Hubungkan hasil rekomendasi ke modul terkait
 **Tujuan**: Tiga fitur saat ini berdiri sendiri. Hasil rekomendasi seharusnya menuntun ke materi.
@@ -487,7 +487,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 3.5 — Audit regulator | ✅ Done | Seluruh 9 penyebutan `Bappebti`/`OJK` dicatat di `docs/regulatory-audit.md` (`TODO(owner): verifikasi di sumber resmi`) tanpa mengubah isi teks |
 | 4.1 — Modul fondasi | ✅ Done | Kategori `"Dasar"` + 3 modul fondasi Pemula (`dasar-tujuan-dana-darurat`, `dasar-inflasi-bunga-majemuk`, `dasar-waspada-bodong-pinjol`); `TODO(owner)` review draf |
 | 4.2 — Jalur belajar | ✅ Done | `getSequentialLearningModules`, `getNextRecommendedModule`, bagian "Mulai dari sini" di `/education`, kartu "Lanjutkan belajar" di `/`, & label rekomendasi lunak pada modul Lanjutan |
-| 4.3 — Judul awam (`plainTitle`) | ⏳ Pending | |
+| 4.3 — Judul awam (`plainTitle`) | ✅ Done | Field wajib `plainTitle` pada seluruh 21 modul, ditampilkan di atas `title` teknis tanpa mengubah `title` |
 | 4.4 — Tautan rekomendasi → modul | ⏳ Pending | Dependency 4.1 |
 | 4.5 — Kesegaran & sumber modul | ⏳ Pending | |
 | 5.1 — README | ⏳ Pending | |
