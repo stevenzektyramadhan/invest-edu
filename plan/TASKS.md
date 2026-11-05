@@ -206,9 +206,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Hapus session kedaluwarsa (`DELETE FROM sessions WHERE expires_at < ?`) saat login/register.
 3. Tambahkan index: `sessions(user_id)` dan `sessions(expires_at)`.
 **Acceptance criteria**:
-- [ ] Isi tabel `sessions` tidak lagi memuat token yang sama dengan nilai cookie.
-- [ ] Login/logout/me tetap berfungsi.
-- [ ] Session kedaluwarsa terhapus.
+- [x] Isi tabel `sessions` tidak lagi memuat token yang sama dengan nilai cookie.
+- [x] Login/logout/me tetap berfungsi.
+- [x] Session kedaluwarsa terhapus.
 **Catatan**: Session aktif lama menjadi tidak valid (pengguna harus login ulang) — wajar, sebutkan di catatan rilis.
 
 ### Task 2.4 — Hilangkan lost update pada user state
@@ -476,7 +476,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 1.6 — Alarm harga jujur | ✅ Done | Polling 60s saat `document.visibilityState === "visible"` + keterangan "Alarm hanya aktif selama halaman ini terbuka." |
 | 2.1 — Rate limit persisten | ✅ Done | Tabel `rate_limits` di Turso, pisah limit per-IP (20/mnt) & per-email (5/15mnt), header IP `x-vercel-forwarded-for`/`x-real-ip` (`TODO(owner)`) |
 | 2.2 — Async scrypt + password min 8 | ✅ Done | `promisify(scrypt)`, `DUMMY_PASSWORD_HASH` untuk timing login setara, `MIN_PASSWORD_LENGTH = 8` hanya pada register (akun lama 6–7 karakter tetap bisa login) |
-| 2.3 — Hardening session | ⏳ Pending | Session lama jadi tidak valid |
+| 2.3 — Hardening session | ✅ Done | Simpan `sha256(token)` di `sessions.token`, bersihkan session kedaluwarsa saat `createSession`, tambah index `user_id` & `expires_at` |
 | 2.4 — Atomic merge user state | ⏳ Pending | |
 | 2.5 — CSP + HSTS | ⏳ Pending | Mulai Report-Only |
 | 2.6 — Hapus akun + privasi | ⏳ Pending | Teks privasi = draf |

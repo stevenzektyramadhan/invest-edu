@@ -3,15 +3,22 @@ import { scrypt } from "node:crypto";
 import { promisify } from "node:util";
 import {
   DUMMY_PASSWORD_HASH,
+  SESSION_TTL_MS,
   checkAuthAttemptRateLimit,
   checkAuthRateLimit,
   clearAuthRateLimit,
+  createSession,
+  createUser,
+  deleteSession,
+  getUserBySessionToken,
   hashPassword,
+  hashSessionToken,
   mergeUserStates,
   resetAuthRateLimitForTests,
   sanitizeUserState,
   verifyPassword,
 } from "./auth";
+import { getDb } from "./db";
 import {
   classifyRiskProfile,
   classifyRiskScore,
@@ -239,6 +246,58 @@ const afterLoginClear = await checkAuthAttemptRateLimit(
 );
 assert.equal(afterLoginClear.allowed, true);
 await resetAuthRateLimitForTests();
+
+const sessionTestEmail = "session-test@example.com";
+await getDb().execute({
+  sql: "DELETE FROM users WHERE email = ?",
+  args: [sessionTestEmail],
+});
+const sessionUser = await createUser({
+  email: sessionTestEmail,
+  name: "Session Tester",
+  passwordHash,
+});
+await getDb().execute({
+  sql: "DELETE FROM sessions WHERE user_id = ?",
+  args: [sessionUser.id],
+});
+
+const expiredToken = await createSession(
+  sessionUser.id,
+  rateLimitNow - SESSION_TTL_MS - 1_000
+);
+const activeToken = await createSession(sessionUser.id, rateLimitNow);
+
+const rawTokenMatch = await getDb().execute({
+  sql: "SELECT token FROM sessions WHERE token = ?",
+  args: [activeToken],
+});
+assert.equal(rawTokenMatch.rows.length, 0);
+
+const hashedTokenMatch = await getDb().execute({
+  sql: "SELECT token FROM sessions WHERE token = ?",
+  args: [hashSessionToken(activeToken)],
+});
+assert.equal(hashedTokenMatch.rows.length, 1);
+
+const expiredTokenMatch = await getDb().execute({
+  sql: "SELECT token FROM sessions WHERE token = ?",
+  args: [hashSessionToken(expiredToken)],
+});
+assert.equal(expiredTokenMatch.rows.length, 0);
+
+const resolvedSessionUser = await getUserBySessionToken(
+  activeToken,
+  rateLimitNow
+);
+assert.deepEqual(resolvedSessionUser, sessionUser);
+
+await deleteSession(activeToken);
+assert.equal(await getUserBySessionToken(activeToken, rateLimitNow), null);
+await getDb().execute({
+  sql: "DELETE FROM users WHERE id = ?",
+  args: [sessionUser.id],
+});
 
 const sanitizedState = sanitizeUserState({
   completedModules: ["reksadana-dasar", 42, "reksadana-dasar"],

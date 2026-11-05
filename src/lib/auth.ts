@@ -1,4 +1,5 @@
 import {
+  createHash,
   randomBytes,
   randomUUID,
   scrypt,
@@ -267,33 +268,56 @@ export async function createUser(input: NewUser): Promise<AuthUser> {
   return user;
 }
 
-export async function createSession(userId: string): Promise<string> {
+export function hashSessionToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+export async function createSession(
+  userId: string,
+  now = Date.now()
+): Promise<string> {
   await ensureSchema();
   const token = randomUUID();
+  const tokenHash = hashSessionToken(token);
+  await getDb().execute({
+    sql: "DELETE FROM sessions WHERE expires_at < ?",
+    args: [now],
+  });
   await getDb().execute({
     sql: "INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)",
-    args: [token, userId, Date.now() + SESSION_TTL_MS, new Date().toISOString()],
+    args: [
+      tokenHash,
+      userId,
+      now + SESSION_TTL_MS,
+      new Date(now).toISOString(),
+    ],
   });
   return token;
 }
 
 export async function deleteSession(token: string): Promise<void> {
   await ensureSchema();
-  await getDb().execute({ sql: "DELETE FROM sessions WHERE token = ?", args: [token] });
+  const tokenHash = hashSessionToken(token);
+  await getDb().execute({
+    sql: "DELETE FROM sessions WHERE token = ?",
+    args: [tokenHash],
+  });
 }
 
 export async function getUserBySessionToken(
-  token: string | undefined
+  token: string | undefined,
+  now = Date.now()
 ): Promise<{ id: string; email: string; name: string } | null> {
   if (!token) return null;
   await ensureSchema();
+  const tokenHash = hashSessionToken(token);
   const result = await getDb().execute({
     sql: `SELECT users.id, users.email, users.name
       FROM sessions
       JOIN users ON users.id = sessions.user_id
       WHERE sessions.token = ? AND sessions.expires_at > ?
       LIMIT 1`,
-    args: [token, Date.now()],
+    args: [tokenHash, now],
   });
   return readAuthUser(result.rows[0]);
 }
