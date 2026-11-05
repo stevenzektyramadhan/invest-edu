@@ -349,24 +349,6 @@ export default function TradingTerminalModal({
           }))
         );
 
-        candleSeries.createPriceLine({
-          price: item.supportLevel,
-          color: "#26a69a",
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: "Support",
-        });
-
-        candleSeries.createPriceLine({
-          price: item.resistanceLevel,
-          color: "#f59e0b",
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: "Resistance",
-        });
-
         for (const alarm of assetAlarms) {
           candleSeries.createPriceLine({
             price: alarm.targetPrice,
@@ -392,24 +374,6 @@ export default function TradingTerminalModal({
             value: c.close,
           }))
         );
-
-        areaSeries.createPriceLine({
-          price: item.supportLevel,
-          color: "#26a69a",
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: "Support",
-        });
-
-        areaSeries.createPriceLine({
-          price: item.resistanceLevel,
-          color: "#f59e0b",
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: "Resistance",
-        });
 
         for (const alarm of assetAlarms) {
           areaSeries.createPriceLine({
@@ -481,7 +445,7 @@ export default function TradingTerminalModal({
       if (resizeObserver) resizeObserver.disconnect();
       if (chartInstance) chartInstance.remove();
     };
-  }, [candles, chartStyle, timeframe, item.supportLevel, item.resistanceLevel, assetAlarms]);
+  }, [candles, chartStyle, timeframe, assetAlarms]);
 
   const handleApplyPreset = (
     cond: AlarmCondition,
@@ -749,15 +713,27 @@ export default function TradingTerminalModal({
                   </span>
                 </div>
                 <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Support Beli</span>
+                  <span className="text-slate-400">
+                    Terendah 7 hari{item.dataStatus === "static" ? " (contoh)" : ""}
+                  </span>
                   <span className="font-mono font-bold text-emerald-400">
-                    {formatCompactAxisPrice(item.supportLevel)}
+                    {formatCompactAxisPrice(
+                      item.sparkline.length > 0
+                        ? Math.min(...item.sparkline)
+                        : item.low24h
+                    )}
                   </span>
                 </div>
                 <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Resistance</span>
+                  <span className="text-slate-400">
+                    Tertinggi 7 hari{item.dataStatus === "static" ? " (contoh)" : ""}
+                  </span>
                   <span className="font-mono font-bold text-amber-400">
-                    {formatCompactAxisPrice(item.resistanceLevel)}
+                    {formatCompactAxisPrice(
+                      item.sparkline.length > 0
+                        ? Math.max(...item.sparkline)
+                        : item.high24h
+                    )}
                   </span>
                 </div>
               </div>
@@ -869,32 +845,6 @@ export default function TradingTerminalModal({
                       className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-sky-400 hover:border-sky-500/50 transition-colors"
                     >
                       Diskon -5%
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleApplyPreset(
-                          "BELOW",
-                          item.supportLevel,
-                          "Beli di Support Kuat"
-                        )
-                      }
-                      className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-emerald-400 hover:border-emerald-500/50 transition-colors"
-                    >
-                      Support
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleApplyPreset(
-                          "ABOVE",
-                          item.resistanceLevel,
-                          "Take Profit di Resistance"
-                        )
-                      }
-                      className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-amber-400 hover:border-amber-500/50 transition-colors"
-                    >
-                      Resistance
                     </button>
                   </div>
                 </div>

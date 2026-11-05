@@ -129,9 +129,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Hapus kedua field dari `MarketItem`, `FALLBACK_ITEMS`, dan pengali di `route.ts`.
 3. Ganti dua sel UI di modal dengan "Terendah 7 hari" dan "Tertinggi 7 hari" yang dihitung dari `sparkline` (`Math.min`/`Math.max`); untuk item `static` tambahkan label "contoh".
 **Acceptance criteria**:
-- [ ] `grep` untuk `supportLevel|resistanceLevel` tidak menemukan apa pun di `src`.
-- [ ] Teks "Support Beli" tidak ada lagi di UI.
-- [ ] `tsc` bersih; modul edukasi `saham-teknikal-sr` tidak diubah.
+- [x] `grep` untuk `supportLevel|resistanceLevel` tidak menemukan apa pun di `src`.
+- [x] Teks "Support Beli" tidak ada lagi di UI.
+- [x] `tsc` bersih; modul edukasi `saham-teknikal-sr` tidak diubah.
 
 ### Task 1.5 — Perbaiki bug cache promise di `ensureSchema()`
 **Tujuan**: Jika koneksi DB gagal sekali, promise yang gagal tersimpan di `schemaPromise` selamanya sehingga seluruh request auth/state gagal sampai server restart.
@@ -471,7 +471,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 1.1 — Pagar pengaman klasifikasi risiko | ✅ Done | `classifyRiskProfile`, aturan keras `emergency_fund`/`horizon`, field `reasons`, UI warning & test |
 | 1.2 — Label chart sintetis, TradingView default | ✅ Done | Default `TV_LIVE`, badge "Ilustrasi — bukan data pasar", sembunyikan TV di `rdpu-index`, catatan `gold-idr` & fallback IDX |
 | 1.3 — Status data per item | ✅ Done | `dataStatus` ("live" \| "static"), `asOf` (`STATIC_SNAPSHOT_AS_OF = "TODO(owner)"`), fallback cache 10s, pill per item & label makro statis |
-| 1.4 — Hapus support/resistance palsu | ⏳ Pending | |
+| 1.4 — Hapus support/resistance palsu | ✅ Done | Hapus `supportLevel`/`resistanceLevel` di seluruh `src/`, ganti dengan Terendah/Tertinggi 7 hari dari `sparkline` |
 | 1.5 — Fix `ensureSchema` | ⏳ Pending | |
 | 1.6 — Alarm harga jujur | ⏳ Pending | |
 | 2.1 — Rate limit persisten | ⏳ Pending | Konfirmasi platform deploy |

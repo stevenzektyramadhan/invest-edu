@@ -11,8 +11,6 @@ export interface MarketItem {
   tradingViewSymbol: string;
   high24h: number;
   low24h: number;
-  supportLevel: number;
-  resistanceLevel: number;
   priceDisplay: string;
   change24h: number;
   change7d: number;
@@ -48,8 +46,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "IDX:COMPOSITE",
     high24h: 7365,
     low24h: 7280,
-    supportLevel: 7150,
-    resistanceLevel: 7450,
     priceDisplay: "7.328,45",
     change24h: 0.64,
     change7d: 1.42,
@@ -70,8 +66,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "IDX:BBCA",
     high24h: 9925,
     low24h: 9750,
-    supportLevel: 9500,
-    resistanceLevel: 10200,
     priceDisplay: "Rp 9.850",
     change24h: 0.77,
     change7d: 2.08,
@@ -92,8 +86,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "IDX:BBRI",
     high24h: 4630,
     low24h: 4540,
-    supportLevel: 4400,
-    resistanceLevel: 4850,
     priceDisplay: "Rp 4.580",
     change24h: -0.43,
     change7d: 1.1,
@@ -114,8 +106,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "SP:SPX",
     high24h: 5915,
     low24h: 5855,
-    supportLevel: 5750,
-    resistanceLevel: 6000,
     priceDisplay: "5.892,10",
     change24h: 0.45,
     change7d: 1.85,
@@ -136,8 +126,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "OANDA:XAUUSD",
     high24h: 1552000,
     low24h: 1534000,
-    supportLevel: 1500000,
-    resistanceLevel: 1600000,
     priceDisplay: "Rp 1.545.000",
     change24h: 0.52,
     change7d: 2.34,
@@ -158,8 +146,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "OANDA:XAUUSD",
     high24h: 45100000,
     low24h: 44500000,
-    supportLevel: 43800000,
-    resistanceLevel: 46000000,
     priceDisplay: "Rp 44.850.000",
     change24h: 0.48,
     change7d: 2.15,
@@ -180,8 +166,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "BINANCE:BTCUSDT",
     high24h: 1448000000,
     low24h: 1395000000,
-    supportLevel: 1350000000,
-    resistanceLevel: 1500000000,
     priceDisplay: "Rp 1.425.000.000",
     change24h: 1.85,
     change7d: 5.4,
@@ -202,8 +186,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "BINANCE:ETHUSDT",
     high24h: 46950000,
     low24h: 45400000,
-    supportLevel: 44000000,
-    resistanceLevel: 48500000,
     priceDisplay: "Rp 46.200.000",
     change24h: 1.12,
     change7d: 3.8,
@@ -224,8 +206,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "",
     high24h: 1486,
     low24h: 1484,
-    supportLevel: 1475,
-    resistanceLevel: 1500,
     priceDisplay: "NAB Rp 1.485 (Yield ~4,85%)",
     change24h: 0.01,
     change7d: 0.09,
@@ -246,8 +226,6 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     tradingViewSymbol: "TVC:ID10Y",
     high24h: 6.72,
     low24h: 6.61,
-    supportLevel: 6.45,
-    resistanceLevel: 6.95,
     priceDisplay: "Yield 6,65% p.a.",
     change24h: 0.12,
     change7d: 0.45,

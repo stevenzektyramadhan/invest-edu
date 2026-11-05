@@ -75,8 +75,6 @@ export async function GET() {
               rawPrice,
               high24h: Math.round(coin.high_24h ?? rawPrice * 1.018),
               low24h: Math.round(coin.low_24h ?? rawPrice * 0.982),
-              supportLevel: Math.round(rawPrice * 0.94),
-              resistanceLevel: Math.round(rawPrice * 1.06),
               priceDisplay: formatIDR(rawPrice),
               change24h: Number((coin.price_change_percentage_24h ?? 0).toFixed(2)),
               change7d: Number(
@@ -97,8 +95,6 @@ export async function GET() {
                   rawPrice: perGram,
                   high24h: Math.round((coin.high_24h ?? coin.current_price * 1.012) / 31.1035),
                   low24h: Math.round((coin.low_24h ?? coin.current_price * 0.988) / 31.1035),
-                  supportLevel: Math.round(perGram * 0.96),
-                  resistanceLevel: Math.round(perGram * 1.04),
                   priceDisplay: formatIDR(perGram),
                   change24h: Number((coin.price_change_percentage_24h ?? 0).toFixed(2)),
                   change7d: Number(

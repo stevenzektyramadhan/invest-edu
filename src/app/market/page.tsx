@@ -711,7 +711,7 @@ export default function MarketDashboardPage() {
           Fluktuasi harian (24 jam) adalah hal wajar di pasar modal. Gunakan
           fitur <strong>Mode Alarm Target Harga</strong> dengan mengklik salah
           satu aset di atas untuk memasang pengingat beli di area{" "}
-          <strong className="text-neutral-200">Support (Diskon)</strong>, sehingga Anda bisa melakukan
+          <strong className="text-neutral-200">harga diskon (Buy on Dip)</strong>, sehingga Anda bisa melakukan
           akumulasi bertahap <strong>Dollar Cost Averaging (DCA)</strong> secara
           disiplin sesuai{" "}
           <a

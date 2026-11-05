@@ -148,8 +148,6 @@ const candles = generateOHLCCandles(
     tradingViewSymbol: "IDX:BBCA",
     high24h: 9925,
     low24h: 9750,
-    supportLevel: 9500,
-    resistanceLevel: 10200,
     priceDisplay: "Rp 9.850",
     change24h: 0.77,
     change7d: 2.08,
