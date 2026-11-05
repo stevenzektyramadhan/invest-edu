@@ -177,10 +177,10 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 4. Pertahankan nama dan signature `checkAuthRateLimit` / `resetAuthRateLimitForTests` jika dipakai test (cek isi `recommendation.test.ts` sebelum mengubah).
 5. Respons 429 + header `Retry-After` tetap.
 **Acceptance criteria**:
-- [ ] Mengganti email di tiap request dari IP yang sama tetap terkena limit per-IP.
-- [ ] Banyak percobaan ke satu email dari IP berbeda tetap terkena limit per-email.
-- [ ] Counter bertahan antar request/instance (disimpan di DB).
-- [ ] Login normal tidak terdampak.
+- [x] Mengganti email di tiap request dari IP yang sama tetap terkena limit per-IP.
+- [x] Banyak percobaan ke satu email dari IP berbeda tetap terkena limit per-email.
+- [x] Counter bertahan antar request/instance (disimpan di DB).
+- [x] Login normal tidak terdampak.
 **Catatan**: Jangan mempercayai header IP dari klien. Jika platform deploy tidak jelas, tandai `TODO(owner)`.
 
 ### Task 2.2 — Async scrypt, samakan waktu respons, naikkan panjang minimal password
@@ -474,7 +474,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 1.4 — Hapus support/resistance palsu | ✅ Done | Hapus `supportLevel`/`resistanceLevel` di seluruh `src/`, ganti dengan Terendah/Tertinggi 7 hari dari `sparkline` |
 | 1.5 — Fix `ensureSchema` | ✅ Done | Reset `schemaPromise = undefined` di `.catch(...)` saat inisialisasi DB gagal |
 | 1.6 — Alarm harga jujur | ✅ Done | Polling 60s saat `document.visibilityState === "visible"` + keterangan "Alarm hanya aktif selama halaman ini terbuka." |
-| 2.1 — Rate limit persisten | ⏳ Pending | Konfirmasi platform deploy |
+| 2.1 — Rate limit persisten | ✅ Done | Tabel `rate_limits` di Turso, pisah limit per-IP (20/mnt) & per-email (5/15mnt), header IP `x-vercel-forwarded-for`/`x-real-ip` (`TODO(owner)`) |
 | 2.2 — Async scrypt + password min 8 | ⏳ Pending | Jangan kunci akun lama |
 | 2.3 — Hardening session | ⏳ Pending | Session lama jadi tidak valid |
 | 2.4 — Atomic merge user state | ⏳ Pending | |

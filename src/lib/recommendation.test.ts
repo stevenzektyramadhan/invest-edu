@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import {
+  checkAuthAttemptRateLimit,
   checkAuthRateLimit,
+  clearAuthRateLimit,
   hashPassword,
   mergeUserStates,
   resetAuthRateLimitForTests,
@@ -169,21 +171,64 @@ assert.doesNotThrow(() => {
   assert.equal(verifyPassword("a".repeat(200), passwordHash), false);
 });
 
-resetAuthRateLimitForTests();
+await resetAuthRateLimitForTests();
 const rateLimitNow = 1_700_000_000_000;
 for (let attempt = 0; attempt < 10; attempt++) {
   assert.equal(
-    checkAuthRateLimit("127.0.0.1:rate-limit@example.com", rateLimitNow).allowed,
+    (await checkAuthRateLimit("127.0.0.1:rate-limit@example.com", rateLimitNow))
+      .allowed,
     true
   );
 }
-const blockedAttempt = checkAuthRateLimit(
+const blockedAttempt = await checkAuthRateLimit(
   "127.0.0.1:rate-limit@example.com",
   rateLimitNow
 );
 assert.equal(blockedAttempt.allowed, false);
 assert.ok(blockedAttempt.retryAfterSeconds > 0);
-resetAuthRateLimitForTests();
+
+await resetAuthRateLimitForTests();
+for (let attempt = 0; attempt < 20; attempt++) {
+  const res = await checkAuthAttemptRateLimit(
+    "203.0.113.10",
+    `attacker-${attempt}@example.com`,
+    rateLimitNow
+  );
+  assert.equal(res.allowed, true);
+}
+const ipBlocked = await checkAuthAttemptRateLimit(
+  "203.0.113.10",
+  "attacker-20@example.com",
+  rateLimitNow
+);
+assert.equal(ipBlocked.allowed, false);
+assert.ok(ipBlocked.retryAfterSeconds > 0);
+
+await resetAuthRateLimitForTests();
+for (let attempt = 0; attempt < 5; attempt++) {
+  const res = await checkAuthAttemptRateLimit(
+    `198.51.100.${attempt + 1}`,
+    "victim@example.com",
+    rateLimitNow
+  );
+  assert.equal(res.allowed, true);
+}
+const emailBlocked = await checkAuthAttemptRateLimit(
+  "198.51.100.99",
+  "victim@example.com",
+  rateLimitNow
+);
+assert.equal(emailBlocked.allowed, false);
+assert.ok(emailBlocked.retryAfterSeconds > 0);
+
+await clearAuthRateLimit("email:victim@example.com");
+const afterLoginClear = await checkAuthAttemptRateLimit(
+  "198.51.100.100",
+  "victim@example.com",
+  rateLimitNow
+);
+assert.equal(afterLoginClear.allowed, true);
+await resetAuthRateLimitForTests();
 
 const sanitizedState = sanitizeUserState({
   completedModules: ["reksadana-dasar", 42, "reksadana-dasar"],

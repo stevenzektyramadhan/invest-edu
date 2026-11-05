@@ -39,12 +39,24 @@ export const MAX_PASSWORD_LENGTH = 128;
 const PASSWORD_KEY_LENGTH = 64;
 const AUTH_RATE_LIMIT_WINDOW_MS = 60_000;
 const AUTH_RATE_LIMIT_MAX_ATTEMPTS = 10;
-const authRateLimits = new Map<string, { count: number; resetAt: number }>();
+export const AUTH_IP_RATE_LIMIT_WINDOW_MS = 60_000;
+export const AUTH_IP_RATE_LIMIT_MAX_ATTEMPTS = 20;
+export const AUTH_EMAIL_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+export const AUTH_EMAIL_RATE_LIMIT_MAX_ATTEMPTS = 5;
+let lastRateLimitPruneAt = 0;
 
 function readString(row: Row | undefined, column: string): string | null {
   if (!row) return null;
   const value = row[column];
   return typeof value === "string" ? value : null;
+}
+
+function readNumber(row: Row | undefined, column: string): number | null {
+  if (!row) return null;
+  const value = row[column];
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "bigint") return Number(value);
+  return null;
 }
 
 function readAuthUser(row: Row | undefined): AuthUser | null {
@@ -102,39 +114,108 @@ export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-function pruneExpiredAuthRateLimits(now: number): void {
-  if (authRateLimits.size <= 500) return;
-  for (const [key, entry] of authRateLimits) {
-    if (entry.resetAt <= now) authRateLimits.delete(key);
-  }
+async function pruneExpiredAuthRateLimits(now: number): Promise<void> {
+  if (Math.abs(now - lastRateLimitPruneAt) < AUTH_RATE_LIMIT_WINDOW_MS) return;
+  lastRateLimitPruneAt = now;
+  await getDb().execute({
+    sql: "DELETE FROM rate_limits WHERE reset_at <= ?",
+    args: [now],
+  });
 }
 
-export function checkAuthRateLimit(
+function getRateLimitPolicy(key: string): {
+  maxAttempts: number;
+  windowMs: number;
+} {
+  if (key.startsWith("ip:")) {
+    return {
+      maxAttempts: AUTH_IP_RATE_LIMIT_MAX_ATTEMPTS,
+      windowMs: AUTH_IP_RATE_LIMIT_WINDOW_MS,
+    };
+  }
+  if (key.startsWith("email:")) {
+    return {
+      maxAttempts: AUTH_EMAIL_RATE_LIMIT_MAX_ATTEMPTS,
+      windowMs: AUTH_EMAIL_RATE_LIMIT_WINDOW_MS,
+    };
+  }
+  return {
+    maxAttempts: AUTH_RATE_LIMIT_MAX_ATTEMPTS,
+    windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
+  };
+}
+
+export async function checkAuthRateLimit(
   key: string,
   now = Date.now()
-): { allowed: boolean; retryAfterSeconds: number } {
-  pruneExpiredAuthRateLimits(now);
+): Promise<{ allowed: boolean; retryAfterSeconds: number }> {
+  await ensureSchema();
+  await pruneExpiredAuthRateLimits(now);
 
-  const entry = authRateLimits.get(key);
-  if (!entry || entry.resetAt <= now) {
-    authRateLimits.set(key, { count: 1, resetAt: now + AUTH_RATE_LIMIT_WINDOW_MS });
-    pruneExpiredAuthRateLimits(now);
-    return { allowed: true, retryAfterSeconds: 0 };
-  }
+  const policy = getRateLimitPolicy(key);
+  const nextResetAt = now + policy.windowMs;
+  const result = await getDb().execute({
+    sql: `INSERT INTO rate_limits (key, count, reset_at)
+      VALUES (?, 1, ?)
+      ON CONFLICT(key) DO UPDATE SET
+        count = CASE WHEN rate_limits.reset_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+        reset_at = CASE WHEN rate_limits.reset_at <= ? THEN excluded.reset_at ELSE rate_limits.reset_at END
+      RETURNING count, reset_at`,
+    args: [key, nextResetAt, now, now],
+  });
 
-  entry.count += 1;
-  if (entry.count <= AUTH_RATE_LIMIT_MAX_ATTEMPTS) {
+  const row = result.rows[0];
+  const count = readNumber(row, "count") ?? 1;
+  const resetAt = readNumber(row, "reset_at") ?? nextResetAt;
+
+  if (count <= policy.maxAttempts) {
     return { allowed: true, retryAfterSeconds: 0 };
   }
 
   return {
     allowed: false,
-    retryAfterSeconds: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
+    retryAfterSeconds: Math.max(1, Math.ceil((resetAt - now) / 1000)),
   };
 }
 
-export function resetAuthRateLimitForTests(): void {
-  authRateLimits.clear();
+export async function checkAuthAttemptRateLimit(
+  clientIp: string,
+  email: string,
+  now = Date.now()
+): Promise<{ allowed: boolean; retryAfterSeconds: number }> {
+  const normalizedIp = clientIp.trim() || "local";
+  const normalizedEmail = normalizeEmail(email);
+
+  const ipResult = await checkAuthRateLimit(`ip:${normalizedIp}`, now);
+  const emailResult = normalizedEmail
+    ? await checkAuthRateLimit(`email:${normalizedEmail}`, now)
+    : { allowed: true, retryAfterSeconds: 0 };
+
+  if (!ipResult.allowed || !emailResult.allowed) {
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.max(
+        ipResult.retryAfterSeconds,
+        emailResult.retryAfterSeconds
+      ),
+    };
+  }
+
+  return { allowed: true, retryAfterSeconds: 0 };
+}
+
+export async function clearAuthRateLimit(key: string): Promise<void> {
+  await ensureSchema();
+  await getDb().execute({
+    sql: "DELETE FROM rate_limits WHERE key = ?",
+    args: [key],
+  });
+}
+
+export async function resetAuthRateLimitForTests(): Promise<void> {
+  await ensureSchema();
+  lastRateLimitPruneAt = 0;
+  await getDb().execute("DELETE FROM rate_limits");
 }
 
 export async function getUserByEmail(

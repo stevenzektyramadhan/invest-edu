@@ -26,6 +26,11 @@ const SCHEMA_STATEMENTS = [
     price_alarms TEXT NOT NULL DEFAULT '[]',
     updated_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS rate_limits (
+    key TEXT PRIMARY KEY,
+    count INTEGER NOT NULL,
+    reset_at INTEGER NOT NULL
+  )`,
 ] as const;
 
 let db: Client | undefined;

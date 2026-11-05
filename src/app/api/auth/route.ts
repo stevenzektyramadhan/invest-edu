@@ -5,7 +5,8 @@ import {
   MIN_PASSWORD_LENGTH,
   SESSION_COOKIE_NAME,
   SESSION_TTL_MS,
-  checkAuthRateLimit,
+  checkAuthAttemptRateLimit,
+  clearAuthRateLimit,
   createSession,
   createUser,
   deleteSession,
@@ -83,6 +84,20 @@ function invalidRequest(message: string): NextResponse {
   return NextResponse.json({ error: message }, { status: 400 });
 }
 
+function getClientIp(request: Request): string {
+  // TODO(owner): Verify target deployment platform (e.g., Vercel) and lock client IP extraction to platform-trusted headers only.
+  const vercelIp = request.headers
+    .get("x-vercel-forwarded-for")
+    ?.split(",")[0]
+    ?.trim();
+  if (vercelIp) return vercelIp;
+
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+
+  return "local";
+}
+
 export async function GET() {
   const cookieStore = await cookies();
   const user = await getUserBySessionToken(
@@ -102,13 +117,8 @@ export async function POST(request: Request) {
   if (!body) return invalidRequest("Permintaan tidak valid.");
 
   if (body.action === "login" || body.action === "register") {
-    const clientIp =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      request.headers.get("x-real-ip") ||
-      "local";
-    const rate = checkAuthRateLimit(
-      `${clientIp}:${normalizeEmail(body.email ?? "")}`
-    );
+    const clientIp = getClientIp(request);
+    const rate = await checkAuthAttemptRateLimit(clientIp, body.email ?? "");
     if (!rate.allowed) {
       return NextResponse.json(
         { error: "Terlalu banyak percobaan. Silakan tunggu sebentar." },
@@ -197,6 +207,8 @@ export async function POST(request: Request) {
           { status: 401 }
         );
       }
+
+      await clearAuthRateLimit(`email:${email}`);
 
       const cloudState = await getUserStateFromDb(user.id);
       const state = await saveUserStateToDb(
