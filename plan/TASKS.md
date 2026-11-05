@@ -263,8 +263,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Default tetap `"netral"`; tambahkan teks: "Mayoritas investor pemula sebaiknya tidak menyesuaikan alokasi berdasarkan tebakan kondisi ekonomi."
 3. Mesin (`MACRO_TILT`) tidak diubah.
 **Acceptance criteria**:
-- [ ] Pengguna baru melihat hasil tanpa harus memilih rezim makro.
-- [ ] Mode lanjutan masih bisa dibuka dan berfungsi; state `macroRegime` tetap tersinkron (`investedu_risk_state`).
+- [x] Pengguna baru melihat hasil tanpa harus memilih rezim makro.
+- [x] Mode lanjutan masih bisa dibuka dan berfungsi; state `macroRegime` tetap tersinkron (`investedu_risk_state`).
 
 ### Task 3.2 — Ganti return/drawdown hardcoded dengan skenario dan kerugian terburuk dalam rupiah
 **Tujuan**: "Agresif: 14%–22%/tahun" terbaca seperti janji, dan `maxHistoricalDrawdown` (-20% s/d -35%) berlabel *historical* padahal tidak dihitung dari data — dengan 15% kripto angka itu hampir pasti terlalu optimistis.
@@ -480,7 +480,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 2.4 — Atomic merge user state | ✅ Done | Transaksi `db.transaction("write")` di `saveUserStateToDb` dengan union `completedModules` |
 | 2.5 — CSP + HSTS | ✅ Done | Header `Content-Security-Policy` (tanpa `'unsafe-eval'` di prod, mengizinkan frame TradingView) & `Strict-Transport-Security` di prod |
 | 2.6 — Hapus akun + privasi | ✅ Done | Action `delete-account` transaksional (`user_state`, `sessions`, `users`), dialog konfirmasi password di `Navbar`, halaman `/privasi` & link footer (`TODO(owner)` draf) |
-| 3.1 — Rezim makro opsional | ⏳ Pending | |
+| 3.1 — Rezim makro opsional | ✅ Done | Selector rezim makro dipindah ke bagian `<details>` "Mode lanjutan" (collapsed default `"netral"`) dengan catatan edukasi |
 | 3.2 — Skenario & worst-case rupiah | ⏳ Pending | Angka wajib bersumber |
 | 3.3 — Rasional personal | ⏳ Pending | Dependency 1.1 |
 | 3.4 — Konsistensi teks | ⏳ Pending | |

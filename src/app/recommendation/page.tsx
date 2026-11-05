@@ -104,69 +104,22 @@ export default function RecommendationPage() {
             Rekomendasi Portofolio Berbasis Profil Risiko & Ekonomi Makro
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-neutral-400">
-            Jawab 5 pertanyaan profil risiko dan pilih kondisi ekonomi makro saat
-            ini untuk mendapatkan simulasi alokasi Saham, Reksa Dana, Emas, dan
-            Kripto yang terukur.
+            Jawab 5 pertanyaan profil risiko untuk mendapatkan simulasi alokasi
+            Saham, Reksa Dana, Emas, dan Kripto yang terukur sesuai kapasitas
+            keuangan Anda.
           </p>
         </div>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12">
-        {/* Left Column: Questionnaire & Macro Selector */}
+        {/* Left Column: Questionnaire & Advanced Macro Selector */}
         <div className="space-y-6 lg:col-span-7">
-          {/* Macroeconomic Condition Selector */}
-          <div className="rounded-2xl border border-neutral-800 bg-panel p-5 sm:p-6">
-            <div className="flex items-center gap-2 text-sm font-bold text-white">
-              <Globe2 className="h-4 w-4 text-neutral-400" />
-              <span>Langkah 1: Pilih Kondisi Ekonomi Makro Saat Ini</span>
-            </div>
-            <p className="mt-1 text-xs text-neutral-400">
-              Siklus suku bunga dan inflasi menentukan bobot taktis portofolio
-              Anda.
-            </p>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {MACRO_REGIMES.map((regime) => {
-                const isSelected = macroRegime === regime.id;
-                return (
-                  <button
-                    key={regime.id}
-                    onClick={() => {
-                      setMacroRegime(regime.id);
-                      updateState(answers, regime.id, capital);
-                    }}
-                    className={`rounded-xl border p-3.5 text-left transition-colors ${
-                      isSelected
-                        ? "border-neutral-400 bg-neutral-800/60 shadow-md shadow-black/40"
-                        : "border-neutral-800 bg-neutral-950/60 hover:border-neutral-700"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white">
-                        {regime.label}
-                      </span>
-                      {isSelected && (
-                        <CheckCircle2 className="h-4 w-4 text-white shrink-0" />
-                      )}
-                    </div>
-                    <p className="mt-1 text-[11px] text-neutral-400">
-                      {regime.subtitle}
-                    </p>
-                    <div className="mt-2 rounded border border-neutral-800 bg-neutral-900 px-2 py-1 text-[10px] font-mono text-neutral-300">
-                      {regime.indicators}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Risk Questionnaire */}
           <div className="rounded-2xl border border-neutral-800 bg-panel p-5 sm:p-6 space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-bold text-white">
                 <ShieldCheck className="h-4 w-4 text-neutral-400" />
-                <span>Langkah 2: Kuesioner Profil Risiko Investor</span>
+                <span>Kuesioner Profil Risiko Investor</span>
               </div>
               <button
                 onClick={() => {
@@ -178,7 +131,8 @@ export default function RecommendationPage() {
                     experience: 2,
                   };
                   setAnswers(def);
-                  updateState(def, macroRegime, capital);
+                  setMacroRegime("netral");
+                  updateState(def, "netral", capital);
                 }}
                 className="inline-flex items-center gap-1 text-xs text-neutral-400 hover:text-white"
               >
@@ -224,6 +178,60 @@ export default function RecommendationPage() {
               ))}
             </div>
           </div>
+
+          {/* Advanced Mode: Macroeconomic Condition Selector (Collapsed by default) */}
+          <details className="group rounded-2xl border border-neutral-800 bg-panel p-5 sm:p-6">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-white">
+              <div className="flex items-center gap-2">
+                <Globe2 className="h-4 w-4 text-neutral-400" />
+                <span>Mode lanjutan: Asumsi Siklus Ekonomi Makro (Opsional)</span>
+              </div>
+              <span className="rounded-full border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 text-[11px] font-medium text-neutral-300">
+                Aktif: {recommendation.macro.label}
+              </span>
+            </summary>
+            <div className="mt-3 space-y-3 border-t border-neutral-800/80 pt-3">
+              <p className="text-xs leading-relaxed text-amber-200/90 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+                Mayoritas investor pemula sebaiknya tidak menyesuaikan alokasi berdasarkan tebakan kondisi ekonomi. Default disetel ke kondisi netral agar fokus pada disiplin investasi rutin (DCA).
+              </p>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {MACRO_REGIMES.map((regime) => {
+                  const isSelected = macroRegime === regime.id;
+                  return (
+                    <button
+                      key={regime.id}
+                      type="button"
+                      onClick={() => {
+                        setMacroRegime(regime.id);
+                        updateState(answers, regime.id, capital);
+                      }}
+                      className={`rounded-xl border p-3.5 text-left transition-colors ${
+                        isSelected
+                          ? "border-neutral-400 bg-neutral-800/60 shadow-md shadow-black/40"
+                          : "border-neutral-800 bg-neutral-950/60 hover:border-neutral-700"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-white">
+                          {regime.label}
+                        </span>
+                        {isSelected && (
+                          <CheckCircle2 className="h-4 w-4 text-white shrink-0" />
+                        )}
+                      </div>
+                      <p className="mt-1 text-[11px] text-neutral-400">
+                        {regime.subtitle}
+                      </p>
+                      <div className="mt-2 rounded border border-neutral-800 bg-neutral-900 px-2 py-1 text-[10px] font-mono text-neutral-300">
+                        {regime.indicators}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </details>
         </div>
 
         {/* Right Column: Live Portfolio Recommendation Result */}
