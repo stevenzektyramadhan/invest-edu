@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { scrypt } from "node:crypto";
+import { promisify } from "node:util";
 import {
+  DUMMY_PASSWORD_HASH,
   checkAuthAttemptRateLimit,
   checkAuthRateLimit,
   clearAuthRateLimit,
@@ -164,12 +167,19 @@ const candles = generateOHLCCandles(
 assert.equal(candles.length, 36);
 assert.equal(candles[candles.length - 1].close, 9850);
 
-const passwordHash = hashPassword("rahasia-aman");
-assert.equal(verifyPassword("rahasia-aman", passwordHash), true);
-assert.equal(verifyPassword("password-salah", passwordHash), false);
-assert.doesNotThrow(() => {
-  assert.equal(verifyPassword("a".repeat(200), passwordHash), false);
-});
+const passwordHash = await hashPassword("rahasia-aman");
+assert.equal(await verifyPassword("rahasia-aman", passwordHash), true);
+assert.equal(await verifyPassword("password-salah", passwordHash), false);
+assert.equal(await verifyPassword("a".repeat(200), passwordHash), false);
+assert.equal(await verifyPassword("rahasia-aman", DUMMY_PASSWORD_HASH), false);
+await assert.rejects(() => hashPassword("1234567"), RangeError);
+
+const scryptTestAsync = promisify(scrypt);
+const legacySalt = "0123456789abcdef0123456789abcdef";
+const legacyDerived = (await scryptTestAsync("123456", legacySalt, 64)) as Buffer;
+const legacyHash = `${legacySalt}:${legacyDerived.toString("hex")}`;
+assert.equal(await verifyPassword("123456", legacyHash), true);
+assert.equal(await verifyPassword("654321", legacyHash), false);
 
 await resetAuthRateLimitForTests();
 const rateLimitNow = 1_700_000_000_000;

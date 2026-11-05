@@ -1,9 +1,10 @@
 import {
   randomBytes,
   randomUUID,
-  scryptSync,
+  scrypt,
   timingSafeEqual,
 } from "node:crypto";
+import { promisify } from "node:util";
 import type { Row } from "@libsql/client";
 import { ensureSchema, getDb } from "./db";
 import { emptyUserState, sanitizeUserState } from "./user-state";
@@ -33,10 +34,12 @@ interface NewUser {
 
 export const SESSION_COOKIE_NAME = "investedu_session";
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-export const MIN_PASSWORD_LENGTH = 6;
+export const MIN_PASSWORD_LENGTH = 8;
 export const MAX_PASSWORD_LENGTH = 128;
 
 const PASSWORD_KEY_LENGTH = 64;
+const scryptAsync = promisify(scrypt);
+export const DUMMY_PASSWORD_HASH = `${randomBytes(16).toString("hex")}:${randomBytes(PASSWORD_KEY_LENGTH).toString("hex")}`;
 const AUTH_RATE_LIMIT_WINDOW_MS = 60_000;
 const AUTH_RATE_LIMIT_MAX_ATTEMPTS = 10;
 export const AUTH_IP_RATE_LIMIT_WINDOW_MS = 60_000;
@@ -81,7 +84,7 @@ function serialize(value: unknown): string {
   return JSON.stringify(value) ?? "null";
 }
 
-export function hashPassword(password: string): string {
+export async function hashPassword(password: string): Promise<string> {
   if (
     password.length < MIN_PASSWORD_LENGTH ||
     password.length > MAX_PASSWORD_LENGTH
@@ -90,12 +93,20 @@ export function hashPassword(password: string): string {
   }
 
   const salt = randomBytes(16).toString("hex");
-  const hashHex = scryptSync(password, salt, PASSWORD_KEY_LENGTH).toString("hex");
+  const derivedKey = (await scryptAsync(
+    password,
+    salt,
+    PASSWORD_KEY_LENGTH
+  )) as Buffer;
+  const hashHex = derivedKey.toString("hex");
   return `${salt}:${hashHex}`;
 }
 
-export function verifyPassword(password: string, storedHash: string): boolean {
-  if (password.length > MAX_PASSWORD_LENGTH) return false;
+export async function verifyPassword(
+  password: string,
+  storedHash: string
+): Promise<boolean> {
+  if (password.length < 1 || password.length > MAX_PASSWORD_LENGTH) return false;
 
   const [salt, hashHex, ...extra] = storedHash.split(":");
   if (!salt || !hashHex || extra.length > 0 || !/^[a-f\d]{128}$/i.test(hashHex)) {
@@ -103,7 +114,11 @@ export function verifyPassword(password: string, storedHash: string): boolean {
   }
 
   const expectedHash = Buffer.from(hashHex, "hex");
-  const actualHash = scryptSync(password, salt, PASSWORD_KEY_LENGTH);
+  const actualHash = (await scryptAsync(
+    password,
+    salt,
+    PASSWORD_KEY_LENGTH
+  )) as Buffer;
   return (
     expectedHash.length === actualHash.length &&
     timingSafeEqual(expectedHash, actualHash)

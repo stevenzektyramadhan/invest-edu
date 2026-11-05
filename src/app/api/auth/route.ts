@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
+  DUMMY_PASSWORD_HASH,
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
   SESSION_COOKIE_NAME,
@@ -135,12 +136,14 @@ export async function POST(request: Request) {
     if (email.length > 254) {
       return invalidRequest("Masukkan alamat email yang valid.");
     }
+    const minPasswordLen =
+      body.action === "register" ? MIN_PASSWORD_LENGTH : 1;
     if (
-      password.length < MIN_PASSWORD_LENGTH ||
+      password.length < minPasswordLen ||
       password.length > MAX_PASSWORD_LENGTH
     ) {
       return invalidRequest(
-        `Password harus memiliki ${MIN_PASSWORD_LENGTH} sampai ${MAX_PASSWORD_LENGTH} karakter.`
+        `Password harus memiliki ${minPasswordLen} sampai ${MAX_PASSWORD_LENGTH} karakter.`
       );
     }
     if (name !== undefined && name.length > 100) {
@@ -182,7 +185,7 @@ export async function POST(request: Request) {
       const user = await createUser({
         email,
         name: body.name?.trim() || email,
-        passwordHash: hashPassword(password),
+        passwordHash: await hashPassword(password),
       });
       const state = await saveUserStateToDb(
         user.id,
@@ -201,7 +204,11 @@ export async function POST(request: Request) {
       const email = normalizeEmail(body.email ?? "");
       const password = body.password ?? "";
       const user = await getUserByEmail(email);
-      if (!user || !verifyPassword(password, user.passwordHash)) {
+      const passwordValid = await verifyPassword(
+        password,
+        user ? user.passwordHash : DUMMY_PASSWORD_HASH
+      );
+      if (!user || !passwordValid) {
         return NextResponse.json(
           { error: "Email atau password salah." },
           { status: 401 }

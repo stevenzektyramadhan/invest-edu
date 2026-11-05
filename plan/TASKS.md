@@ -192,10 +192,10 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 3. `MIN_PASSWORD_LENGTH = 8` — **hanya berlaku untuk register**. Login cukup memeriksa batas maksimum.
 4. Perbarui teks error/hint di form.
 **Acceptance criteria**:
-- [ ] Tidak ada `scryptSync` tersisa di `src`.
-- [ ] Register dengan password 7 karakter ditolak; password 8 karakter diterima.
-- [ ] **Akun lama dengan password 6–7 karakter masih bisa login.**
-- [ ] Login email tidak terdaftar dan password salah menghasilkan pesan yang sama.
+- [x] Tidak ada `scryptSync` tersisa di `src`.
+- [x] Register dengan password 7 karakter ditolak; password 8 karakter diterima.
+- [x] **Akun lama dengan password 6–7 karakter masih bisa login.**
+- [x] Login email tidak terdaftar dan password salah menghasilkan pesan yang sama.
 **Catatan**: Gotcha utama — route login saat ini memvalidasi panjang password untuk register **dan** login. Jika `MIN_PASSWORD_LENGTH` dinaikkan tanpa memisahkan, pengguna lama terkunci.
 
 ### Task 2.3 — Hardening session
@@ -475,7 +475,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 1.5 — Fix `ensureSchema` | ✅ Done | Reset `schemaPromise = undefined` di `.catch(...)` saat inisialisasi DB gagal |
 | 1.6 — Alarm harga jujur | ✅ Done | Polling 60s saat `document.visibilityState === "visible"` + keterangan "Alarm hanya aktif selama halaman ini terbuka." |
 | 2.1 — Rate limit persisten | ✅ Done | Tabel `rate_limits` di Turso, pisah limit per-IP (20/mnt) & per-email (5/15mnt), header IP `x-vercel-forwarded-for`/`x-real-ip` (`TODO(owner)`) |
-| 2.2 — Async scrypt + password min 8 | ⏳ Pending | Jangan kunci akun lama |
+| 2.2 — Async scrypt + password min 8 | ✅ Done | `promisify(scrypt)`, `DUMMY_PASSWORD_HASH` untuk timing login setara, `MIN_PASSWORD_LENGTH = 8` hanya pada register (akun lama 6–7 karakter tetap bisa login) |
 | 2.3 — Hardening session | ⏳ Pending | Session lama jadi tidak valid |
 | 2.4 — Atomic merge user state | ⏳ Pending | |
 | 2.5 — CSP + HSTS | ⏳ Pending | Mulai Report-Only |
