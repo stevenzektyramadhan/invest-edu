@@ -21,6 +21,15 @@ export interface AllocationBreakdown {
   kripto: number; // %
 }
 
+export interface RiskAnswers {
+  horizon?: number;
+  drawdown?: number;
+  emergency_fund?: number;
+  income?: number;
+  experience?: number;
+  [key: string]: number | undefined;
+}
+
 export interface PortfolioRecommendation {
   profile: RiskProfileType;
   score: number;
@@ -29,6 +38,7 @@ export interface PortfolioRecommendation {
   expectedAnnualReturn: string;
   maxHistoricalDrawdown: string;
   rationale: string;
+  reasons: string[];
   tacticalActions: string[];
   instrumentDetails: {
     asset: string;
@@ -161,6 +171,90 @@ const MACRO_TILT: Record<MacroRegime, AllocationBreakdown> = {
   krisis_inflasi: { reksaDanaPasarUangObligasi: +5, emas: +10, saham: -10, kripto: -5 },
 };
 
+function normalizeAnswerPoint(value: number | undefined): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 2;
+  return Math.min(3, Math.max(1, Math.round(value)));
+}
+
+export function classifyRiskProfile(answers: RiskAnswers): RiskProfileType {
+  const a = {
+    horizon: normalizeAnswerPoint(answers.horizon),
+    drawdown: normalizeAnswerPoint(answers.drawdown),
+    emergency_fund: normalizeAnswerPoint(answers.emergency_fund),
+    income: normalizeAnswerPoint(answers.income),
+    experience: normalizeAnswerPoint(answers.experience),
+  };
+  const capacity = Math.min(a.horizon, a.emergency_fund, a.income);
+  const tolerance = Math.round((a.drawdown + a.experience) / 2);
+  const level = Math.min(capacity, tolerance);
+  if (level <= 1) return "Konservatif";
+  if (level === 2) return "Moderat";
+  return "Agresif";
+}
+
+function buildProfileReasons(
+  profile: RiskProfileType,
+  totalScore: number,
+  answers?: RiskAnswers
+): string[] {
+  if (!answers) {
+    return [`Profil ${profile} ditentukan dari total skor kuesioner (${totalScore}/15).`];
+  }
+
+  const reasons: string[] = [];
+  const horizon = normalizeAnswerPoint(answers.horizon);
+  const drawdown = normalizeAnswerPoint(answers.drawdown);
+  const emergencyFund = normalizeAnswerPoint(answers.emergency_fund);
+  const income = normalizeAnswerPoint(answers.income);
+  const experience = normalizeAnswerPoint(answers.experience);
+
+  if (emergencyFund === 1) {
+    reasons.push(
+      "Dana darurat belum tersedia (< 3× pengeluaran bulanan), sehingga profil dibatasi maksimal Konservatif dan porsi kripto dikunci 0%."
+    );
+  } else if (emergencyFund === 2) {
+    reasons.push(
+      "Dana darurat sudah tersedia (3–6× pengeluaran bulanan) sebagai penyangga likuiditas dasar."
+    );
+  } else {
+    reasons.push(
+      "Dana darurat sangat aman (> 6× pengeluaran bulanan) sehingga fondasi kas keluarga terjaga."
+    );
+  }
+
+  if (horizon === 1) {
+    reasons.push(
+      "Horizon investasi jangka pendek (< 2 tahun), sehingga porsi saham dibatasi maksimal 10% dan kripto 0% agar modal pokok tidak tergerus volatilitas."
+    );
+  } else if (horizon === 2) {
+    reasons.push(
+      "Horizon investasi menengah (3–5 tahun) memberi ruang terukur untuk kombinasi aset stabil dan bertumbuh."
+    );
+  } else {
+    reasons.push(
+      "Horizon investasi panjang (> 5 tahun) memberi waktu yang cukup untuk menyerap fluktuasi pasar saham."
+    );
+  }
+
+  if (income === 1) {
+    reasons.push(
+      "Arus kas bulanan belum menentu, sehingga kemampuan menanggung risiko dibatasi pada level Konservatif."
+    );
+  }
+
+  const tolerance = Math.round((drawdown + experience) / 2);
+  if (tolerance === 1) {
+    reasons.push(
+      "Kenyamanan terhadap fluktuasi dan pengalaman pasar masih di tahap awal, sehingga profil disesuaikan agar tetap tenang saat pasar terkoreksi."
+    );
+  }
+
+  return reasons;
+}
+
+/**
+ * @deprecated Use classifyRiskProfile(answers) to separate risk capacity from risk tolerance.
+ */
 export function classifyRiskScore(totalScore: number): RiskProfileType {
   if (totalScore <= 8) return "Konservatif";
   if (totalScore <= 12) return "Moderat";
@@ -169,22 +263,41 @@ export function classifyRiskScore(totalScore: number): RiskProfileType {
 
 export function generateRecommendation(
   totalScore: number,
-  macroId: MacroRegime
+  macroId: MacroRegime,
+  answers?: RiskAnswers
 ): PortfolioRecommendation {
-  const profile = classifyRiskScore(totalScore);
+  let profile = answers ? classifyRiskProfile(answers) : classifyRiskScore(totalScore);
+  if (answers?.emergency_fund === 1) {
+    profile = "Konservatif";
+  }
+
   const base = BASE_ALLOCATION[profile];
   const tilt = MACRO_TILT[macroId];
   const macro = MACRO_REGIMES.find((m) => m.id === macroId) || MACRO_REGIMES[0];
 
   let rd = Math.max(5, base.reksaDanaPasarUangObligasi + tilt.reksaDanaPasarUangObligasi);
   const emas = Math.max(5, base.emas + tilt.emas);
-  const saham = Math.max(0, base.saham + tilt.saham);
+  let saham = Math.max(0, base.saham + tilt.saham);
   let kripto = Math.max(0, base.kripto + tilt.kripto);
 
   // If conservative, cap crypto at 0 unless expansion where max 5%
   if (profile === "Konservatif" && macroId !== "ekspansi") {
     rd += kripto;
     kripto = 0;
+  }
+
+  if (answers?.emergency_fund === 1) {
+    rd += kripto;
+    kripto = 0;
+  }
+
+  if (answers?.horizon === 1) {
+    rd += kripto;
+    kripto = 0;
+    if (saham > 10) {
+      rd += saham - 10;
+      saham = 10;
+    }
   }
 
   // Normalize so sum is exactly 100%
@@ -214,7 +327,14 @@ export function generateRecommendation(
 
   const rationale = `Berdasarkan skor risiko Anda (${totalScore}/15), profil Anda adalah ${profile}. Dalam rezim ekonomi "${macro.label}", mesin alokasi melakukan penyesuaian taktis untuk mengoptimalkan imbal hasil sekaligus menjaga ketahanan modal.`;
 
+  const reasons = buildProfileReasons(profile, totalScore, answers);
+
   const tacticalActions: string[] = [
+    ...(answers?.emergency_fund === 1
+      ? [
+          "Bangun dana darurat 3–6× pengeluaran bulanan di tabungan terpisah atau RDPU sebelum menambah aset berisiko.",
+        ]
+      : []),
     profile === "Konservatif"
       ? "Prioritaskan keamanan modal pokok pada Reksa Dana Pasar Uang (RDPU), SBN Ritel (ORI/SR/ST), dan Emas."
       : profile === "Moderat"
@@ -277,6 +397,7 @@ export function generateRecommendation(
     expectedAnnualReturn: expectedReturnMap[profile],
     maxHistoricalDrawdown: drawdownMap[profile],
     rationale,
+    reasons,
     tacticalActions,
     instrumentDetails,
   };

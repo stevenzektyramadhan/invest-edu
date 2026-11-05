@@ -86,7 +86,9 @@ export default function RecommendationPage() {
   };
 
   const totalScore = Object.values(answers).reduce((acc, v) => acc + v, 0);
-  const recommendation = generateRecommendation(totalScore, macroRegime);
+  const recommendation = generateRecommendation(totalScore, macroRegime, answers);
+  const hasHardGuardrail =
+    answers.emergency_fund === 1 || answers.horizon === 1;
 
   return (
     <div className="space-y-8">
@@ -250,6 +252,34 @@ export default function RecommendationPage() {
                 </span>
               </div>
             </div>
+
+            {hasHardGuardrail && (
+              <div
+                role="alert"
+                className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs text-amber-200 space-y-1.5"
+              >
+                <div className="flex items-center gap-2 font-bold text-amber-300">
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+                  <span>Pagar Pengaman Risiko Aktif</span>
+                </div>
+                {answers.emergency_fund === 1 && (
+                  <p className="leading-relaxed">
+                    Dana darurat Anda belum mencapai 3× pengeluaran bulanan.
+                    Profil dikunci ke <strong>Konservatif</strong> dan alokasi
+                    kripto ditetapkan <strong>0%</strong> agar dana kebutuhan
+                    darurat tidak terpapar aset bergejolak tinggi.
+                  </p>
+                )}
+                {answers.horizon === 1 && (
+                  <p className="leading-relaxed">
+                    Horizon investasi Anda kurang dari 2 tahun. Porsi saham
+                    dibatasi maksimal <strong>10%</strong> dan kripto{" "}
+                    <strong>0%</strong> untuk melindungi modal yang akan segera
+                    digunakan.
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Capital Simulator Input */}
             <div className="space-y-2 rounded-xl border border-neutral-800 bg-neutral-950 p-3.5">

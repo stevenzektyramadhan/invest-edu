@@ -7,7 +7,13 @@ import {
   sanitizeUserState,
   verifyPassword,
 } from "./auth";
-import { classifyRiskScore, generateRecommendation, MACRO_REGIMES } from "./recommendation";
+import {
+  classifyRiskProfile,
+  classifyRiskScore,
+  generateRecommendation,
+  MACRO_REGIMES,
+  type RiskAnswers,
+} from "./recommendation";
 import {
   evaluateAlarms,
   generateOHLCCandles,
@@ -31,6 +37,67 @@ for (let score = 5; score <= 15; score++) {
       100,
       `Allocation must sum to 100% for score=${score}, regime=${regime.id}, got ${total}`
     );
+  }
+}
+
+const noEmergencyFundHighOther: RiskAnswers = {
+  horizon: 3,
+  drawdown: 3,
+  emergency_fund: 1,
+  income: 3,
+  experience: 3,
+};
+assert.equal(classifyRiskProfile(noEmergencyFundHighOther), "Konservatif");
+for (const regime of MACRO_REGIMES) {
+  const rec = generateRecommendation(13, regime.id, noEmergencyFundHighOther);
+  assert.equal(rec.profile, "Konservatif");
+  assert.equal(
+    rec.allocation.kripto,
+    0,
+    `emergency_fund=1 must force kripto=0 in regime=${regime.id}`
+  );
+  assert.match(rec.tacticalActions[0], /dana darurat 3–6× pengeluaran bulanan/i);
+  assert.ok(rec.reasons.some((r) => r.toLowerCase().includes("dana darurat")));
+}
+
+for (const baseLevel of [1, 2, 3]) {
+  for (const emergencyFund of [1, 2, 3]) {
+    for (const horizon of [1, 2, 3]) {
+      for (const regime of MACRO_REGIMES) {
+        const answers: RiskAnswers = {
+          horizon,
+          drawdown: baseLevel,
+          emergency_fund: emergencyFund,
+          income: baseLevel,
+          experience: baseLevel,
+        };
+        const score =
+          answers.horizon! +
+          answers.drawdown! +
+          answers.emergency_fund! +
+          answers.income! +
+          answers.experience!;
+        const rec = generateRecommendation(score, regime.id, answers);
+        const { reksaDanaPasarUangObligasi, emas, saham, kripto } = rec.allocation;
+        assert.ok(
+          reksaDanaPasarUangObligasi >= 0 && emas >= 0 && saham >= 0 && kripto >= 0,
+          `Negative allocation found for regime=${regime.id}, ef=${emergencyFund}, h=${horizon}`
+        );
+        assert.equal(
+          reksaDanaPasarUangObligasi + emas + saham + kripto,
+          100,
+          `Sum must be 100 for regime=${regime.id}, ef=${emergencyFund}, h=${horizon}`
+        );
+        if (emergencyFund === 1) {
+          assert.equal(rec.profile, "Konservatif");
+          assert.equal(kripto, 0);
+        }
+        if (horizon === 1) {
+          assert.ok(saham <= 10, `horizon=1 must cap saham <= 10, got ${saham}`);
+          assert.equal(kripto, 0, `horizon=1 must force kripto=0, got ${kripto}`);
+        }
+      }
+    }
   }
 }
 
