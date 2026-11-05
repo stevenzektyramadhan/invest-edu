@@ -8,6 +8,11 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export interface EducationSource {
+  label: string;
+  url: string;
+}
+
 export interface EducationModule {
   id: string;
   moduleNumber: number;
@@ -34,6 +39,8 @@ export interface EducationModule {
   actionChecklist: string[];
   quiz: QuizQuestion;
   quizzes: QuizQuestion[];
+  lastReviewed?: string;
+  sources?: EducationSource[];
 }
 
 export const ASSET_OVERVIEW: Record<
@@ -89,7 +96,50 @@ export const ASSET_OVERVIEW: Record<
   },
 };
 
-// TODO(owner): verifikasi draf 3 modul fondasi ("Dasar") dan seluruh plainTitle sebelum dipublikasikan
+// TODO(owner): verifikasi draf 3 modul fondasi ("Dasar"), seluruh plainTitle, dan sumber rujukan sebelum dipublikasikan. Jangan isi lastReviewed sebelum ditinjau pemilik.
+const PROPOSED_SOURCES_DASAR: EducationSource[] = [
+  {
+    label: "Sikapi Uangmu (ojk.go.id) — TODO(owner): verifikasi",
+    url: "https://sikapiuangmu.ojk.go.id",
+  },
+];
+
+const PROPOSED_SOURCES_REKSADANA: EducationSource[] = [
+  {
+    label: "Otoritas Jasa Keuangan (ojk.go.id) — TODO(owner): verifikasi",
+    url: "https://www.ojk.go.id",
+  },
+  {
+    label: "DJPPR Kemenkeu RI (djppr.kemenkeu.go.id) — TODO(owner): verifikasi",
+    url: "https://www.djppr.kemenkeu.go.id",
+  },
+];
+
+const PROPOSED_SOURCES_EMAS: EducationSource[] = [
+  {
+    label: "Otoritas Jasa Keuangan (ojk.go.id) — TODO(owner): verifikasi",
+    url: "https://www.ojk.go.id",
+  },
+];
+
+const PROPOSED_SOURCES_SAHAM: EducationSource[] = [
+  {
+    label: "Bursa Efek Indonesia (idx.co.id) — TODO(owner): verifikasi",
+    url: "https://www.idx.co.id",
+  },
+  {
+    label: "Otoritas Jasa Keuangan (ojk.go.id) — TODO(owner): verifikasi",
+    url: "https://www.ojk.go.id",
+  },
+];
+
+const PROPOSED_SOURCES_KRIPTO: EducationSource[] = [
+  {
+    label: "Otoritas Jasa Keuangan (ojk.go.id) — TODO(owner): verifikasi",
+    url: "https://www.ojk.go.id",
+  },
+];
+
 export const EDUCATION_MODULES: EducationModule[] = [
   {
     id: "dasar-tujuan-dana-darurat",
@@ -101,6 +151,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "8 menit",
     riskRating: "Rendah",
+    sources: PROPOSED_SOURCES_DASAR,
     summary:
       "Sebelum membeli instrumen investasi apa pun, tentukan untuk apa uang Anda dikumpulkan dan amankan dana darurat 3–6 kali pengeluaran bulanan agar Anda tidak terpaksa menjual investasi saat sedang rugi.",
     keyTakeaways: [
@@ -212,6 +263,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "9 menit",
     riskRating: "Rendah",
+    sources: PROPOSED_SOURCES_DASAR,
     summary:
       "Jumlah uang di rekening boleh tetap sama, tetapi barang yang bisa dibeli makin sedikit karena kenaikan harga (inflasi). Pahami cara menjaga daya beli dan bagaimana menabung/investasi rutin bekerja lewat efek waktu.",
     keyTakeaways: [
@@ -323,6 +375,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "9 menit",
     riskRating: "Rendah",
+    sources: PROPOSED_SOURCES_DASAR,
     summary:
       "Keuntungan terbaik adalah uang yang tidak hilang karena penipuan. Kenali pola janji untung pasti (ponzi), bahaya berinvestasi dengan uang pinjaman, serta langkah memeriksa izin resmi sebelum mentransfer uang.",
     keyTakeaways: [
@@ -435,6 +488,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "10 menit",
     riskRating: "Rendah",
+    sources: PROPOSED_SOURCES_REKSADANA,
     summary:
       "Bangun fondasi sebelum membeli: pahami empat jenis Reksa Dana, bagaimana NAB/UP bergerak, peran Manajer Investasi dan Bank Kustodian, serta perlakuan pajaknya bagi investor Indonesia.",
     keyTakeaways: [
@@ -526,6 +580,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "12 menit",
     riskRating: "Sedang",
+    sources: PROPOSED_SOURCES_REKSADANA,
     summary:
       "Jangan menyaring Reksa Dana dari return saja. Bandingkan skala dana kelolaan, biaya, komposisi, drawdown, konsistensi terhadap benchmark, dan kompensasi return terhadap risiko.",
     keyTakeaways: [
@@ -621,6 +676,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "13 menit",
     riskRating: "Rendah",
+    sources: PROPOSED_SOURCES_REKSADANA,
     summary:
       "Pahami SBN Ritel sebagai instrumen pemerintah: perbedaan tradable dan non-tradable, kupon fixed atau floating with floor, risiko harga, fitur early redemption, serta pajak final kupon 10%.",
     keyTakeaways: [
@@ -716,6 +772,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Lanjutan",
     readTime: "14 menit",
     riskRating: "Sedang",
+    sources: PROPOSED_SOURCES_REKSADANA,
     summary:
       "Naik-turunnya suku bunga tidak berdampak sama pada semua obligasi. Pelajari durasi, yield curve, ladder, risiko kredit, dan mengapa pivot bank sentral dapat mengubah peluang sekaligus risiko RDPT.",
     keyTakeaways: [
@@ -805,6 +862,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "10 menit",
     riskRating: "Rendah",
+    sources: PROPOSED_SOURCES_EMAS,
     summary:
       "Emas dapat berperan sebagai diversifier dan cadangan nilai, tetapi bukan mesin return tetap. Kenali hubungannya dengan inflasi, ketidakpastian geopolitik, suku bunga riil, dan spread harga.",
     keyTakeaways: [
@@ -890,6 +948,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "12 menit",
     riskRating: "Sedang",
+    sources: PROPOSED_SOURCES_EMAS,
     summary:
       "Keputusan emas yang baik dimulai dari matematika: hitung break-even spread, pahami trade-off gramasi kecil versus besar, dan ketahui konteks pajak emas batangan menurut PMK 48/2023.",
     keyTakeaways: [
@@ -984,6 +1043,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "13 menit",
     riskRating: "Sedang",
+    sources: PROPOSED_SOURCES_EMAS,
     summary:
       "Bentuk emas menentukan risiko Anda: kepemilikan fisik, risiko kustodian platform digital, paparan pasar melalui produk bursa, dan risiko leverage kontrak berjangka bukanlah hal yang sama.",
     keyTakeaways: [
@@ -1073,6 +1133,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Lanjutan",
     readTime: "15 menit",
     riskRating: "Sedang",
+    sources: PROPOSED_SOURCES_EMAS,
     summary:
       "Naik-turunnya emas dipengaruhi banyak penggerak makro. Pelajari rasio harga global ke rupiah, DXY, real yield US Treasury, korelasi yang tidak stabil, dan rebalancing sebagai disiplin alih-alih ramalan.",
     keyTakeaways: [
@@ -1157,6 +1218,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "12 menit",
     riskRating: "Tinggi",
+    sources: PROPOSED_SOURCES_SAHAM,
     summary:
       "Saham adalah kepemilikan bisnis yang diperdagangkan di BEI. Pahami RDN, 1 lot = 100 lembar, penyimpanan melalui KSEI, dua sumber return, biaya transaksi, dan pajak penjualan saham.",
     keyTakeaways: [
@@ -1241,6 +1303,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "15 menit",
     riskRating: "Tinggi",
+    sources: PROPOSED_SOURCES_SAHAM,
     summary:
       "Rasio tidak memberi jawaban instan, tetapi membantu mengubah laporan keuangan menjadi pertanyaan yang tepat tentang profitabilitas, utang, valuasi, siklus laba, dan kualitas bisnis.",
     keyTakeaways: [
@@ -1330,6 +1393,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "13 menit",
     riskRating: "Tinggi",
+    sources: PROPOSED_SOURCES_SAHAM,
     summary:
       "Yield tinggi belum tentu pendapatan berkualitas. Pelajari timeline dividen, payout ratio, keberlanjutan arus kas, total return, PPh dividen, dan bahaya membeli hanya demi cum date.",
     keyTakeaways: [
@@ -1419,6 +1483,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "14 menit",
     riskRating: "Tinggi",
+    sources: PROPOSED_SOURCES_SAHAM,
     summary:
       "Teknikal yang disiplin menempatkan harga, struktur tren, level, volume, dan risiko dalam satu rencana. Ia tidak menggantikan laporan keuangan, keterbukaan informasi, atau manajemen posisi.",
     keyTakeaways: [
@@ -1508,6 +1573,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Lanjutan",
     readTime: "15 menit",
     riskRating: "Tinggi",
+    sources: PROPOSED_SOURCES_SAHAM,
     summary:
       "Keunggulan jangka panjang datang dari bertahan. Pelajari risiko per transaksi, ukuran posisi, risk/reward, gap risk, korelasi portofolio, dan cara menulis aturan agar emosi tidak mengendalikan keputusan.",
     keyTakeaways: [
@@ -1592,6 +1658,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Lanjutan",
     readTime: "16 menit",
     riskRating: "Sedang",
+    sources: PROPOSED_SOURCES_SAHAM,
     summary:
       "Kondisi makro mengubah biaya modal, laba, kurs, dan selera risiko. Pelajari kuadran pertumbuhan-inflasi, BI Rate, foreign flow, serta rebalancing agar tidak mengubah berita menjadi taruhan all-in.",
     keyTakeaways: [
@@ -1676,6 +1743,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Pemula",
     readTime: "13 menit",
     riskRating: "Sangat Tinggi",
+    sources: PROPOSED_SOURCES_KRIPTO,
     summary:
       "Bitcoin memiliki aturan suplai dan jaringan yang berbeda dari saham atau emas, tetapi tetap sangat volatil. Pelajari halving, likuiditas global, alokasi uang dingin, dan status pengawasan aset kripto di Indonesia.",
     keyTakeaways: [
@@ -1760,6 +1828,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Menengah",
     readTime: "15 menit",
     riskRating: "Sangat Tinggi",
+    sources: PROPOSED_SOURCES_KRIPTO,
     summary:
       "Altcoin dapat memiliki teknologi menarik tetapi struktur suplai buruk. Pelajari market cap, FDV, circulating supply, cliff, vesting, unlock, likuiditas, dan data on-chain tanpa melupakan risiko proyek.",
     keyTakeaways: [
@@ -1849,6 +1918,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Lanjutan",
     readTime: "16 menit",
     riskRating: "Sangat Tinggi",
+    sources: PROPOSED_SOURCES_KRIPTO,
     summary:
       "Indikator siklus membantu mengatur ekspektasi, bukan memanggil puncak atau dasar. Pelajari BTC dominance, MVRV Z-Score, Fear & Greed, rotasi altcoin, dan bagaimana menggabungkan sinyal yang saling bertentangan.",
     keyTakeaways: [
@@ -1934,6 +2004,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     level: "Lanjutan",
     readTime: "16 menit",
     riskRating: "Sangat Tinggi",
+    sources: PROPOSED_SOURCES_KRIPTO,
     summary:
       "Keamanan adalah bagian dari return. Bandingkan risiko kustodi CEX dan self-custody, lindungi seed phrase, uji transfer kecil, dan pahami mengapa leverage futures dapat melikuidasi modal sebelum tesis Anda terbukti benar.",
     keyTakeaways: [

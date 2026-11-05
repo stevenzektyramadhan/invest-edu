@@ -545,6 +545,12 @@ export default function EducationPage() {
                 <span className="inline-flex items-center gap-1.5 font-medium text-neutral-400">
                   {module.sections.length} bagian materi · {module.quizzes.length} soal kuis
                 </span>
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-neutral-500 sm:col-span-2">
+                  Tinjauan materi:{" "}
+                  <strong className="font-medium text-neutral-400">
+                    {module.lastReviewed ?? "Belum diverifikasi ulang"}
+                  </strong>
+                </span>
               </div>
 
               <span className="mt-4 inline-flex items-center gap-1 font-semibold text-white transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none">
@@ -802,6 +808,38 @@ export default function EducationPage() {
                   </div>
                 )}
               </section>
+
+              <footer className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 text-xs text-neutral-400">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-semibold text-neutral-300">Status Tinjauan Materi</span>
+                  <span className="rounded-md border border-neutral-700 bg-neutral-900 px-2.5 py-0.5 text-[11px] font-medium text-neutral-300">
+                    {activeModule.lastReviewed
+                      ? `Terakhir ditinjau: ${activeModule.lastReviewed}`
+                      : "Belum diverifikasi ulang"}
+                  </span>
+                </div>
+                {activeModule.sources && activeModule.sources.length > 0 && (
+                  <div className="mt-3 border-t border-neutral-800/80 pt-3">
+                    <p className="text-[11px] font-semibold text-neutral-400">
+                      Sumber Rujukan untuk Verifikasi Mandiri:
+                    </p>
+                    <ul className="mt-1.5 flex flex-wrap gap-2">
+                      {activeModule.sources.map((src) => (
+                        <li key={`${src.url}-${src.label}`}>
+                          <a
+                            href={src.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-md border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-[11px] text-sky-300 transition-colors hover:border-sky-500/50 hover:text-sky-200"
+                          >
+                            {src.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </footer>
 
               <div className="flex flex-col-reverse gap-3 border-t border-neutral-800 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <button

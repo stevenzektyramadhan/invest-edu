@@ -376,8 +376,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Tampilkan di footer modul. Jika `lastReviewed` kosong, tampilkan "Belum diverifikasi ulang".
 3. **Jangan mengisi `lastReviewed`** untuk modul yang belum benar-benar diperiksa pemilik. `sources` boleh diusulkan (ojk.go.id, djppr.kemenkeu.go.id, idx.co.id) dan wajib bertanda `TODO(owner): verifikasi`.
 **Acceptance criteria**:
-- [ ] Footer modul menampilkan tanggal tinjau atau "Belum diverifikasi ulang".
-- [ ] Tidak ada tanggal "terverifikasi" yang diisi agent.
+- [x] Footer modul menampilkan tanggal tinjau atau "Belum diverifikasi ulang".
+- [x] Tidak ada tanggal "terverifikasi" yang diisi agent.
 
 ---
 
@@ -489,7 +489,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 4.2 — Jalur belajar | ✅ Done | `getSequentialLearningModules`, `getNextRecommendedModule`, bagian "Mulai dari sini" di `/education`, kartu "Lanjutkan belajar" di `/`, & label rekomendasi lunak pada modul Lanjutan |
 | 4.3 — Judul awam (`plainTitle`) | ✅ Done | Field wajib `plainTitle` pada seluruh 21 modul, ditampilkan di atas `title` teknis tanpa mengubah `title` |
 | 4.4 — Tautan rekomendasi → modul | ✅ Done | Pemetaan `RECOMMENDATION_ASSET_MODULE_MAP` & `EMERGENCY_FUND_MODULE_ID`, tautan `next/link` "Pelajari: …" di kartu instrumen & banner dana darurat |
-| 4.5 — Kesegaran & sumber modul | ⏳ Pending | |
+| 4.5 — Kesegaran & sumber modul | ✅ Done | Field opsional `lastReviewed` & `sources` (`TODO(owner): verifikasi`), tampilkan "Belum diverifikasi ulang" di footer saat kosong |
 | 5.1 — README | ⏳ Pending | |
 | 5.2 — Scripts + CI | ⏳ Pending | |
 | 5.3 — Pindah logika murni | ⏳ Pending | Setelah 1.2, 1.4, 1.6 |
