@@ -39,6 +39,7 @@ const LIVE_TICKERS = [
 ];
 
 const ASSET_ICONS: Record<AssetCategory, typeof Activity> = {
+  Dasar: ShieldCheck,
   "Reksa Dana": Layers,
   Emas: Coins,
   Saham: TrendingUp,

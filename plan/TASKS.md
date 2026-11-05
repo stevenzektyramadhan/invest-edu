@@ -329,9 +329,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
    - `dasar-waspada-bodong-pinjol` — ciri investasi bodong, pinjol ilegal, dan utang konsumtif.
 3. Gunakan bahasa sehari-hari; hindari istilah teknis tanpa penjelasan.
 **Acceptance criteria**:
-- [ ] Tiga modul tampil di halaman edukasi dengan kategori "Dasar" dan level Pemula.
-- [ ] Setiap modul punya kuis, red flags, dan checklist aksi.
-- [ ] `tsc` bersih (semua `Record<AssetCategory, ...>` terisi).
+- [x] Tiga modul tampil di halaman edukasi dengan kategori "Dasar" dan level Pemula.
+- [x] Setiap modul punya kuis, red flags, dan checklist aksi.
+- [x] `tsc` bersih (semua `Record<AssetCategory, ...>` terisi).
 **Catatan**: Angka/regulasi di konten harus berasal dari sumber resmi atau diberi `TODO(owner)`. Jangan mengarang statistik.
 
 ### Task 4.2 — Jalur belajar berurutan
@@ -485,7 +485,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 3.3 — Rasional personal | ✅ Done | Daftar `reasons` bahasa awam per jawaban kuesioner & `rationale` satu kalimat yang merujuk `reasons` |
 | 3.4 — Konsistensi teks | ✅ Done | Persentase `tacticalActions` dihitung dinamis dari `allocation`, label contoh ilustrasi pada BTC/ETH, tanpa klaim "mesin alokasi ... mengoptimalkan" |
 | 3.5 — Audit regulator | ✅ Done | Seluruh 9 penyebutan `Bappebti`/`OJK` dicatat di `docs/regulatory-audit.md` (`TODO(owner): verifikasi di sumber resmi`) tanpa mengubah isi teks |
-| 4.1 — Modul fondasi | ⏳ Pending | Konten butuh review pemilik |
+| 4.1 — Modul fondasi | ✅ Done | Kategori `"Dasar"` + 3 modul fondasi Pemula (`dasar-tujuan-dana-darurat`, `dasar-inflasi-bunga-majemuk`, `dasar-waspada-bodong-pinjol`); `TODO(owner)` review draf |
 | 4.2 — Jalur belajar | ⏳ Pending | Dependency 4.1 |
 | 4.3 — Judul awam (`plainTitle`) | ⏳ Pending | |
 | 4.4 — Tautan rekomendasi → modul | ⏳ Pending | Dependency 4.1 |

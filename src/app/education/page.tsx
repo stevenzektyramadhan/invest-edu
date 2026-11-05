@@ -32,7 +32,7 @@ import {
 } from "@/lib/user-sync";
 
 const STORAGE_KEY = MODULES_STORAGE_KEY;
-const ASSET_CATEGORIES: AssetCategory[] = ["Reksa Dana", "Emas", "Saham", "Kripto"];
+const ASSET_CATEGORIES: AssetCategory[] = ["Dasar", "Reksa Dana", "Emas", "Saham", "Kripto"];
 const DIFFICULTY_LEVELS: DifficultyLevel[] = ["Pemula", "Menengah", "Lanjutan"];
 const CATEGORY_FILTERS: ("Semua" | AssetCategory)[] = ["Semua", ...ASSET_CATEGORIES];
 const LEVEL_FILTERS: ("Semua" | DifficultyLevel)[] = ["Semua", ...DIFFICULTY_LEVELS];
@@ -245,7 +245,7 @@ export default function EducationPage() {
           </div>
           <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4">
             <div className="text-xs font-medium text-neutral-400">Menurut Kelas Aset</div>
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
               {categoryBreakdown.map(({ category, count }) => (
                 <div key={category} className="rounded-lg bg-neutral-950/80 border border-neutral-800/60 px-2.5 py-2">
                   <div className="text-[11px] text-neutral-400">{category}</div>
@@ -270,9 +270,9 @@ export default function EducationPage() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-neutral-300">
-          Komparasi Karakteristik 4 Instrumen Utama
+          Fondasi Keuangan &amp; Karakteristik Instrumen Utama
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {ASSET_CATEGORIES.map((asset) => {
             const info = ASSET_OVERVIEW[asset];
             const isSelected = selectedCategory === asset;
