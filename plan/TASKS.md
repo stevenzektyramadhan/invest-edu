@@ -275,9 +275,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 3. Tampilkan kerugian terburuk dalam rupiah memakai `capital` dari state ("Modal Rp10 juta bisa turun menjadi sekitar Rp…").
 4. Ganti label menjadi "Perkiraan penurunan terburuk (ilustratif)". Tambahkan kalimat: hasil masa lalu bukan jaminan masa depan.
 **Acceptance criteria**:
-- [ ] Tidak ada teks "expected return" berupa satu rentang pasti di UI.
-- [ ] Worst-case profil Agresif ≥ worst-case Moderat ≥ worst-case Konservatif (diuji).
-- [ ] Setiap angka asumsi punya `source`/`period`, atau bertanda `TODO(owner): verifikasi`.
+- [x] Tidak ada teks "expected return" berupa satu rentang pasti di UI.
+- [x] Worst-case profil Agresif ≥ worst-case Moderat ≥ worst-case Konservatif (diuji).
+- [x] Setiap angka asumsi punya `source`/`period`, atau bertanda `TODO(owner): verifikasi`.
 **Catatan**: Agent **tidak boleh mengarang** angka historis. Jika tidak bisa mengambil dari sumber terverifikasi, tandai angka sebagai asumsi ilustratif dan minta pemilik mengisi/memverifikasi sumbernya.
 
 ### Task 3.3 — Rasional personal pada hasil rekomendasi
@@ -481,7 +481,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 2.5 — CSP + HSTS | ✅ Done | Header `Content-Security-Policy` (tanpa `'unsafe-eval'` di prod, mengizinkan frame TradingView) & `Strict-Transport-Security` di prod |
 | 2.6 — Hapus akun + privasi | ✅ Done | Action `delete-account` transaksional (`user_state`, `sessions`, `users`), dialog konfirmasi password di `Navbar`, halaman `/privasi` & link footer (`TODO(owner)` draf) |
 | 3.1 — Rezim makro opsional | ✅ Done | Selector rezim makro dipindah ke bagian `<details>` "Mode lanjutan" (collapsed default `"netral"`) dengan catatan edukasi |
-| 3.2 — Skenario & worst-case rupiah | ⏳ Pending | Angka wajib bersumber |
+| 3.2 — Skenario & worst-case rupiah | ✅ Done | Skenario buruk/dasar/baik, `ASSET_SCENARIO_ASSUMPTIONS` (`source`/`period` bertanda `TODO(owner)`), & penurunan terburuk dalam Rupiah |
 | 3.3 — Rasional personal | ⏳ Pending | Dependency 1.1 |
 | 3.4 — Konsistensi teks | ⏳ Pending | |
 | 3.5 — Audit regulator | ⏳ Pending | Menunggu verifikasi pemilik |

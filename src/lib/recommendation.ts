@@ -30,11 +30,29 @@ export interface RiskAnswers {
   [key: string]: number | undefined;
 }
 
+export interface AssetScenarioAssumption {
+  label: string;
+  badAnnualPct: number;
+  baseAnnualPct: number;
+  goodAnnualPct: number;
+  stressDrawdownPct: number;
+  source: string;
+  period: string;
+}
+
+export interface ReturnScenarios {
+  badPct: number;
+  basePct: number;
+  goodPct: number;
+}
+
 export interface PortfolioRecommendation {
   profile: RiskProfileType;
   score: number;
   macro: MacroRegimeInfo;
   allocation: AllocationBreakdown;
+  scenarios: ReturnScenarios;
+  worstCaseDrawdownPct: number;
   expectedAnnualReturn: string;
   maxHistoricalDrawdown: string;
   rationale: string;
@@ -48,6 +66,49 @@ export interface PortfolioRecommendation {
     roleInPortfolio: string;
   }[];
 }
+
+// ponytail: static illustrative scenario & stress table; TODO(owner) to verify official historical series
+export const ASSET_SCENARIO_ASSUMPTIONS: Record<
+  keyof AllocationBreakdown,
+  AssetScenarioAssumption
+> = {
+  reksaDanaPasarUangObligasi: {
+    label: "Reksa Dana Pasar Uang & SBN",
+    badAnnualPct: 2,
+    baseAnnualPct: 5,
+    goodAnnualPct: 7,
+    stressDrawdownPct: -3,
+    source: "TODO(owner): verifikasi — asumsi ilustratif RDPU/SBN Ritel (DJPPR Kemenkeu / OJK)",
+    period: "TODO(owner): verifikasi periode acuan",
+  },
+  emas: {
+    label: "Emas",
+    badAnnualPct: -8,
+    baseAnnualPct: 6,
+    goodAnnualPct: 15,
+    stressDrawdownPct: -15,
+    source: "TODO(owner): verifikasi — asumsi ilustratif emas IDR (Logam Mulia / LBMA)",
+    period: "TODO(owner): verifikasi periode acuan",
+  },
+  saham: {
+    label: "Saham",
+    badAnnualPct: -20,
+    baseAnnualPct: 9,
+    goodAnnualPct: 18,
+    stressDrawdownPct: -35,
+    source: "TODO(owner): verifikasi — asumsi ilustratif indeks saham domestik (BEI / IDX)",
+    period: "TODO(owner): verifikasi periode acuan",
+  },
+  kripto: {
+    label: "Aset Kripto",
+    badAnnualPct: -55,
+    baseAnnualPct: 15,
+    goodAnnualPct: 45,
+    stressDrawdownPct: -75,
+    source: "TODO(owner): verifikasi — asumsi ilustratif aset kripto utama BTC/ETH",
+    period: "TODO(owner): verifikasi periode acuan",
+  },
+};
 
 export const MACRO_REGIMES: MacroRegimeInfo[] = [
   {
@@ -170,6 +231,44 @@ const MACRO_TILT: Record<MacroRegime, AllocationBreakdown> = {
   bunga_tinggi: { reksaDanaPasarUangObligasi: +10, emas: 0, saham: -5, kripto: -5 },
   krisis_inflasi: { reksaDanaPasarUangObligasi: +5, emas: +10, saham: -10, kripto: -5 },
 };
+
+function roundOneDecimal(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+function formatSignedPercent(value: number): string {
+  const prefix = value > 0 ? "+" : "";
+  return `${prefix}${value}%`;
+}
+
+export function computePortfolioScenarios(allocation: AllocationBreakdown): {
+  scenarios: ReturnScenarios;
+  worstCaseDrawdownPct: number;
+} {
+  const keys = Object.keys(ASSET_SCENARIO_ASSUMPTIONS) as (keyof AllocationBreakdown)[];
+  let bad = 0;
+  let base = 0;
+  let good = 0;
+  let stress = 0;
+
+  for (const key of keys) {
+    const weight = allocation[key] / 100;
+    const assumption = ASSET_SCENARIO_ASSUMPTIONS[key];
+    bad += weight * assumption.badAnnualPct;
+    base += weight * assumption.baseAnnualPct;
+    good += weight * assumption.goodAnnualPct;
+    stress += weight * assumption.stressDrawdownPct;
+  }
+
+  return {
+    scenarios: {
+      badPct: roundOneDecimal(bad),
+      basePct: roundOneDecimal(base),
+      goodPct: roundOneDecimal(good),
+    },
+    worstCaseDrawdownPct: roundOneDecimal(stress),
+  };
+}
 
 function normalizeAnswerPoint(value: number | undefined): number {
   if (typeof value !== "number" || !Number.isFinite(value)) return 2;
@@ -313,17 +412,9 @@ export function generateRecommendation(
     kripto,
   };
 
-  const expectedReturnMap: Record<RiskProfileType, string> = {
-    Konservatif: "6% – 8.5% / tahun",
-    Moderat: "9% – 13% / tahun",
-    Agresif: "14% – 22% / tahun",
-  };
-
-  const drawdownMap: Record<RiskProfileType, string> = {
-    Konservatif: "-2% s/d -5%",
-    Moderat: "-8% s/d -15%",
-    Agresif: "-20% s/d -35%",
-  };
+  const { scenarios, worstCaseDrawdownPct } = computePortfolioScenarios(allocation);
+  const expectedAnnualReturn = `Skenario ilustratif: Buruk ${formatSignedPercent(scenarios.badPct)} · Dasar ${formatSignedPercent(scenarios.basePct)} · Baik ${formatSignedPercent(scenarios.goodPct)} / tahun`;
+  const maxHistoricalDrawdown = `Sekitar ${worstCaseDrawdownPct}% (ilustratif)`;
 
   const rationale = `Berdasarkan skor risiko Anda (${totalScore}/15), profil Anda adalah ${profile}. Dalam rezim ekonomi "${macro.label}", mesin alokasi melakukan penyesuaian taktis untuk mengoptimalkan imbal hasil sekaligus menjaga ketahanan modal.`;
 
@@ -394,8 +485,10 @@ export function generateRecommendation(
     score: totalScore,
     macro,
     allocation,
-    expectedAnnualReturn: expectedReturnMap[profile],
-    maxHistoricalDrawdown: drawdownMap[profile],
+    scenarios,
+    worstCaseDrawdownPct,
+    expectedAnnualReturn,
+    maxHistoricalDrawdown,
     rationale,
     reasons,
     tacticalActions,

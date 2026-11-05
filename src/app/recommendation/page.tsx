@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
+  ASSET_SCENARIO_ASSUMPTIONS,
   MACRO_REGIMES,
   RISK_QUESTIONS,
   generateRecommendation,
@@ -89,6 +90,9 @@ export default function RecommendationPage() {
   const recommendation = generateRecommendation(totalScore, macroRegime, answers);
   const hasHardGuardrail =
     answers.emergency_fund === 1 || answers.horizon === 1;
+  const worstCaseLossFraction = Math.abs(recommendation.worstCaseDrawdownPct) / 100;
+  const worstCaseLossAmount = Math.round(capital * worstCaseLossFraction);
+  const worstCaseEndingCapital = Math.max(0, capital - worstCaseLossAmount);
 
   return (
     <div className="space-y-8">
@@ -397,25 +401,80 @@ export default function RecommendationPage() {
               })}
             </div>
 
-            {/* Expected Return & Max Drawdown */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-3">
-                <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
-                  <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>Estimasi Imbal Hasil</span>
+            <div className="space-y-3">
+              <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-3.5 space-y-2.5">
+                <div className="flex items-center justify-between gap-2 text-[11px] text-neutral-400">
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-neutral-300">
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Skenario Hasil Tahunan (Ilustratif)</span>
+                  </span>
+                  <span className="text-[10px] text-neutral-500">Bukan janji imbal hasil</span>
                 </div>
-                <div className="mt-1 text-sm font-bold text-emerald-400">
-                  {recommendation.expectedAnnualReturn}
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-lg border border-neutral-800/80 bg-neutral-900/60 p-2">
+                    <div className="text-[10px] text-neutral-400">Buruk</div>
+                    <div
+                      className={`mt-0.5 text-xs font-bold ${
+                        recommendation.scenarios.badPct < 0
+                          ? "text-rose-400"
+                          : "text-neutral-200"
+                      }`}
+                    >
+                      {recommendation.scenarios.badPct > 0 ? "+" : ""}
+                      {recommendation.scenarios.badPct}%
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-neutral-800/80 bg-neutral-900/60 p-2">
+                    <div className="text-[10px] text-neutral-400">Dasar</div>
+                    <div className="mt-0.5 text-xs font-bold text-neutral-100">
+                      {recommendation.scenarios.basePct > 0 ? "+" : ""}
+                      {recommendation.scenarios.basePct}%
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-neutral-800/80 bg-neutral-900/60 p-2">
+                    <div className="text-[10px] text-neutral-400">Baik</div>
+                    <div className="mt-0.5 text-xs font-bold text-emerald-400">
+                      +{recommendation.scenarios.goodPct}%
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-3">
-                <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
-                  <AlertTriangle className="h-3.5 w-3.5 text-rose-400" />
-                  <span>Risiko Fluktuasi</span>
+
+              <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-3.5 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-300">
+                    <AlertTriangle className="h-3.5 w-3.5 text-rose-400 shrink-0" />
+                    <span>Perkiraan penurunan terburuk (ilustratif)</span>
+                  </div>
+                  <span className="text-sm font-extrabold text-rose-400">
+                    {recommendation.worstCaseDrawdownPct}%
+                  </span>
                 </div>
-                <div className="mt-1 text-sm font-bold text-rose-400">
-                  {recommendation.maxHistoricalDrawdown}
-                </div>
+                <p className="text-xs leading-relaxed text-neutral-200">
+                  Modal <strong>{formatIDR(capital)}</strong> bisa turun menjadi sekitar{" "}
+                  <strong className="text-rose-300">{formatIDR(worstCaseEndingCapital)}</strong>{" "}
+                  (penurunan sekitar {formatIDR(worstCaseLossAmount)}) jika pasar mengalami tekanan berat.
+                </p>
+                <p className="text-[11px] text-neutral-400">
+                  Hasil masa lalu bukan jaminan masa depan. Angka dihitung dari bobot alokasi × asumsi stres ilustratif per aset.
+                </p>
+                <details className="pt-1 text-[11px] text-neutral-400">
+                  <summary className="cursor-pointer font-medium text-neutral-300 hover:text-white">
+                    Lihat asumsi stres per aset & status verifikasi sumber
+                  </summary>
+                  <ul className="mt-2 space-y-1.5 border-t border-neutral-800/80 pt-2">
+                    {Object.values(ASSET_SCENARIO_ASSUMPTIONS).map((item) => (
+                      <li key={item.label} className="text-[10px] leading-relaxed">
+                        <strong className="text-neutral-200">{item.label}:</strong> stres{" "}
+                        {item.stressDrawdownPct}% (buruk {item.badAnnualPct}% / dasar +
+                        {item.baseAnnualPct}% / baik +{item.goodAnnualPct}%) —{" "}
+                        <span className="text-neutral-500">
+                          {item.source} ({item.period})
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               </div>
             </div>
 

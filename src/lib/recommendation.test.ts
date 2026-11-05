@@ -23,6 +23,7 @@ import {
 } from "./auth";
 import { getDb } from "./db";
 import {
+  ASSET_SCENARIO_ASSUMPTIONS,
   classifyRiskProfile,
   classifyRiskScore,
   generateRecommendation,
@@ -111,9 +112,48 @@ for (const baseLevel of [1, 2, 3]) {
           assert.ok(saham <= 10, `horizon=1 must cap saham <= 10, got ${saham}`);
           assert.equal(kripto, 0, `horizon=1 must force kripto=0, got ${kripto}`);
         }
+        assert.ok(rec.scenarios.badPct <= rec.scenarios.basePct);
+        assert.ok(rec.scenarios.basePct <= rec.scenarios.goodPct);
       }
     }
   }
+}
+
+for (const assumption of Object.values(ASSET_SCENARIO_ASSUMPTIONS)) {
+  assert.ok(assumption.source.length > 0);
+  assert.ok(assumption.period.length > 0);
+}
+
+for (const regime of MACRO_REGIMES) {
+  const konservatif = generateRecommendation(5, regime.id, {
+    horizon: 1,
+    drawdown: 1,
+    emergency_fund: 1,
+    income: 1,
+    experience: 1,
+  });
+  const moderat = generateRecommendation(10, regime.id, {
+    horizon: 2,
+    drawdown: 2,
+    emergency_fund: 2,
+    income: 2,
+    experience: 2,
+  });
+  const agresif = generateRecommendation(15, regime.id, {
+    horizon: 3,
+    drawdown: 3,
+    emergency_fund: 3,
+    income: 3,
+    experience: 3,
+  });
+  assert.ok(
+    Math.abs(agresif.worstCaseDrawdownPct) >= Math.abs(moderat.worstCaseDrawdownPct),
+    `Expected |Agresif drawdown| >= |Moderat drawdown| in regime=${regime.id}`
+  );
+  assert.ok(
+    Math.abs(moderat.worstCaseDrawdownPct) >= Math.abs(konservatif.worstCaseDrawdownPct),
+    `Expected |Moderat drawdown| >= |Konservatif drawdown| in regime=${regime.id}`
+  );
 }
 
 const sampleAlarms: PriceAlarm[] = [
