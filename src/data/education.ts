@@ -2077,3 +2077,23 @@ export function hasCompletedCategoryPrerequisites(
   return prerequisites.every((prereq) => completedSet.has(prereq.id));
 }
 
+export const EMERGENCY_FUND_MODULE_ID = "dasar-tujuan-dana-darurat";
+
+export const RECOMMENDATION_ASSET_MODULE_MAP: Record<
+  "reksaDanaPasarUangObligasi" | "emas" | "saham" | "kripto",
+  string[]
+> = {
+  reksaDanaPasarUangObligasi: ["reksadana-dasar", "reksadana-sbn-ritel"],
+  emas: ["emas-safe-haven"],
+  saham: ["saham-fundamental"],
+  kripto: ["kripto-fundamental", "kripto-keamanan-wallet"],
+};
+
+export function getEducationModulesByIds(ids: readonly string[]): EducationModule[] {
+  const byId = new Map(EDUCATION_MODULES.map((mod) => [mod.id, mod]));
+  return ids
+    .map((id) => byId.get(id))
+    .filter((mod): mod is EducationModule => Boolean(mod));
+}
+
+

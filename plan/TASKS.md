@@ -364,8 +364,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Buat pemetaan aset → id modul (mis. emas → `emas-safe-haven`; RDPU/SBN → `reksadana-dasar`, `reksadana-sbn-ritel`; saham → `saham-fundamental`; kripto → `kripto-fundamental`, `kripto-keamanan-wallet`; dana darurat → `dasar-tujuan-dana-darurat`).
 2. Di kartu instrumen pada hasil rekomendasi, tambahkan tautan `next/link` "Pelajari: …".
 **Acceptance criteria**:
-- [ ] Setiap aset berporsi > 0 punya tautan ke modul yang valid (id divalidasi oleh tipe/tes).
-- [ ] Jika aturan keras dana darurat aktif, tautan ke modul dana darurat muncul paling atas.
+- [x] Setiap aset berporsi > 0 punya tautan ke modul yang valid (id divalidasi oleh tipe/tes).
+- [x] Jika aturan keras dana darurat aktif, tautan ke modul dana darurat muncul paling atas.
 **Dependency**: Task 4.1 (untuk modul dana darurat)
 
 ### Task 4.5 — Penanda kesegaran dan sumber pada modul
@@ -488,7 +488,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 4.1 — Modul fondasi | ✅ Done | Kategori `"Dasar"` + 3 modul fondasi Pemula (`dasar-tujuan-dana-darurat`, `dasar-inflasi-bunga-majemuk`, `dasar-waspada-bodong-pinjol`); `TODO(owner)` review draf |
 | 4.2 — Jalur belajar | ✅ Done | `getSequentialLearningModules`, `getNextRecommendedModule`, bagian "Mulai dari sini" di `/education`, kartu "Lanjutkan belajar" di `/`, & label rekomendasi lunak pada modul Lanjutan |
 | 4.3 — Judul awam (`plainTitle`) | ✅ Done | Field wajib `plainTitle` pada seluruh 21 modul, ditampilkan di atas `title` teknis tanpa mengubah `title` |
-| 4.4 — Tautan rekomendasi → modul | ⏳ Pending | Dependency 4.1 |
+| 4.4 — Tautan rekomendasi → modul | ✅ Done | Pemetaan `RECOMMENDATION_ASSET_MODULE_MAP` & `EMERGENCY_FUND_MODULE_ID`, tautan `next/link` "Pelajari: …" di kartu instrumen & banner dana darurat |
 | 4.5 — Kesegaran & sumber modul | ⏳ Pending | |
 | 5.1 — README | ⏳ Pending | |
 | 5.2 — Scripts + CI | ⏳ Pending | |

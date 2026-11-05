@@ -1,3 +1,5 @@
+import { RECOMMENDATION_ASSET_MODULE_MAP } from "@/data/education";
+
 export type RiskProfileType = "Konservatif" | "Moderat" | "Agresif";
 
 export type MacroRegime =
@@ -64,6 +66,7 @@ export interface PortfolioRecommendation {
     color: string;
     specificInstruments: string;
     roleInPortfolio: string;
+    relatedModuleIds: string[];
   }[];
 }
 
@@ -504,6 +507,7 @@ export function generateRecommendation(
           ? "Contoh kategori: RD Pasar Uang, SBN Ritel (SBR/ST), RD Pendapatan Tetap"
           : "Contoh kategori: RD Pendapatan Tetap (Obligasi Negara/Korporasi) & Kas RDPU",
       roleInPortfolio: "Penjaga likuiditas, arus kas kupon stabil & peredam volatilitas",
+      relatedModuleIds: RECOMMENDATION_ASSET_MODULE_MAP.reksaDanaPasarUangObligasi,
     },
     {
       asset: "Emas (Safe Haven)",
@@ -511,6 +515,7 @@ export function generateRecommendation(
       color: "#f59e0b", // amber-500
       specificInstruments: "Emas Batangan (Antam/UBS) atau Emas Digital Berizin Bappebti",
       roleInPortfolio: "Pelindung daya beli terhadap inflasi & asuransi risiko geopolitik",
+      relatedModuleIds: RECOMMENDATION_ASSET_MODULE_MAP.emas,
     },
     {
       asset: "Saham (Ekuitas)",
@@ -521,6 +526,7 @@ export function generateRecommendation(
           ? "Contoh kategori: Reksa Dana Indeks IDX30 / Saham Big Banks Dividen"
           : "Contoh kategori: Saham Blue Chip LQ45, Perbankan, Consumer & Sektor Komoditas",
       roleInPortfolio: "Mesin pertumbuhan modal jangka panjang (Capital Gain & Dividen)",
+      relatedModuleIds: RECOMMENDATION_ASSET_MODULE_MAP.saham,
     },
     {
       asset: "Aset Kripto",
@@ -531,6 +537,7 @@ export function generateRecommendation(
           ? "Contoh ilustrasi pembagian (bukan instruksi beli): Bitcoin (BTC) 80% + Ethereum (ETH) 20% (Tanpa Leverage)"
           : "Tidak disarankan untuk profil risiko & kondisi makro saat ini",
       roleInPortfolio: "Akselerator imbal hasil asimetris dengan manajemen risiko ketat",
+      relatedModuleIds: RECOMMENDATION_ASSET_MODULE_MAP.kripto,
     },
   ];
 

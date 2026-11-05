@@ -32,6 +32,9 @@ import {
 } from "./recommendation";
 import {
   EDUCATION_MODULES,
+  EMERGENCY_FUND_MODULE_ID,
+  RECOMMENDATION_ASSET_MODULE_MAP,
+  getEducationModulesByIds,
   getNextRecommendedModule,
   getSequentialLearningModules,
   hasCompletedCategoryPrerequisites,
@@ -536,5 +539,29 @@ assert.equal(
   ]),
   true
 );
+
+const validModuleIds = new Set(EDUCATION_MODULES.map((m) => m.id));
+assert.ok(validModuleIds.has(EMERGENCY_FUND_MODULE_ID));
+for (const ids of Object.values(RECOMMENDATION_ASSET_MODULE_MAP)) {
+  assert.ok(ids.length > 0);
+  const resolved = getEducationModulesByIds(ids);
+  assert.equal(resolved.length, ids.length);
+  for (const id of ids) {
+    assert.ok(validModuleIds.has(id), `Invalid module id in map: ${id}`);
+  }
+}
+
+for (const score of [5, 10, 15]) {
+  for (const regime of MACRO_REGIMES) {
+    const rec = generateRecommendation(score, regime.id);
+    for (const item of rec.instrumentDetails) {
+      if (item.percentage > 0) {
+        assert.ok(item.relatedModuleIds.length > 0);
+        const resolved = getEducationModulesByIds(item.relatedModuleIds);
+        assert.equal(resolved.length, item.relatedModuleIds.length);
+      }
+    }
+  }
+}
 
 console.log("self-check passed: allocation, alarms, auth, and user state verified");
