@@ -1995,3 +1995,63 @@ export const EDUCATION_MODULES: EducationModule[] = [
     ],
   },
 ];
+
+const CATEGORY_LEARNING_ORDER: Record<AssetCategory, number> = {
+  Dasar: 0,
+  "Reksa Dana": 1,
+  Emas: 2,
+  Saham: 3,
+  Kripto: 4,
+};
+
+const LEVEL_LEARNING_ORDER: Record<DifficultyLevel, number> = {
+  Pemula: 0,
+  Menengah: 1,
+  Lanjutan: 2,
+};
+
+export function getSequentialLearningModules(): EducationModule[] {
+  return [...EDUCATION_MODULES].sort((a, b) => {
+    const aIsFoundation = a.category === "Dasar" ? 0 : 1;
+    const bIsFoundation = b.category === "Dasar" ? 0 : 1;
+    if (aIsFoundation !== bIsFoundation) {
+      return aIsFoundation - bIsFoundation;
+    }
+
+    const levelDiff = LEVEL_LEARNING_ORDER[a.level] - LEVEL_LEARNING_ORDER[b.level];
+    if (levelDiff !== 0) {
+      return levelDiff;
+    }
+
+    const categoryDiff =
+      CATEGORY_LEARNING_ORDER[a.category] - CATEGORY_LEARNING_ORDER[b.category];
+    if (categoryDiff !== 0) {
+      return categoryDiff;
+    }
+
+    return a.moduleNumber - b.moduleNumber;
+  });
+}
+
+export function getNextRecommendedModule(completedIds: readonly string[]): EducationModule | null {
+  const completedSet = new Set(completedIds);
+  const ordered = getSequentialLearningModules();
+  return ordered.find((mod) => !completedSet.has(mod.id)) ?? null;
+}
+
+export function hasCompletedCategoryPrerequisites(
+  module: EducationModule,
+  completedIds: readonly string[]
+): boolean {
+  if (module.level !== "Lanjutan") {
+    return true;
+  }
+  const completedSet = new Set(completedIds);
+  const prerequisites = EDUCATION_MODULES.filter(
+    (candidate) =>
+      candidate.category === module.category &&
+      (candidate.level === "Pemula" || candidate.level === "Menengah")
+  );
+  return prerequisites.every((prereq) => completedSet.has(prereq.id));
+}
+

@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ASSET_OVERVIEW, EDUCATION_MODULES, type AssetCategory } from "@/data/education";
+import {
+  ASSET_OVERVIEW,
+  EDUCATION_MODULES,
+  getNextRecommendedModule,
+  getSequentialLearningModules,
+  type AssetCategory,
+} from "@/data/education";
 import { generateRecommendation, type MacroRegime } from "@/lib/recommendation";
 import { MODULES_STORAGE_KEY, RISK_STORAGE_KEY, SYNC_EVENT_NAME } from "@/lib/user-sync";
 import {
@@ -53,8 +59,10 @@ const DCA_PRESETS = [
   { label: "5 Jt", val: 5_000_000 },
 ];
 
+const PILLAR_ASSET_CATEGORIES: AssetCategory[] = ["Reksa Dana", "Emas", "Saham", "Kripto"];
+
 export default function HomePage() {
-  const [completedCount, setCompletedCount] = useState(0);
+  const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [savedScore, setSavedScore] = useState<number>(10);
   const [savedMacro, setSavedMacro] = useState<MacroRegime>("netral");
   const [monthlySave, setMonthlySave] = useState<number>(1_000_000);
@@ -66,9 +74,13 @@ export default function HomePage() {
       const mods = localStorage.getItem(MODULES_STORAGE_KEY);
       if (mods) {
         const parsed: unknown = JSON.parse(mods);
-        if (Array.isArray(parsed)) setCompletedCount(parsed.length);
+        if (Array.isArray(parsed) && parsed.every((id) => typeof id === "string")) {
+          setCompletedIds(parsed);
+        } else {
+          setCompletedIds([]);
+        }
       } else {
-        setCompletedCount(0);
+        setCompletedIds([]);
       }
 
       const risk = localStorage.getItem(RISK_STORAGE_KEY);
@@ -99,6 +111,12 @@ export default function HomePage() {
   }, []);
 
   const rec = generateRecommendation(savedScore, savedMacro);
+  const completedCount = completedIds.length;
+  const sequentialModules = getSequentialLearningModules();
+  const nextRecommendedModule = getNextRecommendedModule(completedIds);
+  const nextStepNumber = nextRecommendedModule
+    ? sequentialModules.findIndex((mod) => mod.id === nextRecommendedModule.id) + 1
+    : sequentialModules.length;
 
   // Compounding DCA calculation
   const months = years * 12;
@@ -270,7 +288,7 @@ export default function HomePage() {
         <div className="relative rounded-xl border border-neutral-800 bg-panel p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors">
           <div>
             <div className="flex items-center justify-between text-xs text-neutral-400">
-              <span>Kurikulum Edukasi</span>
+              <span>Lanjutkan Belajar</span>
               <CheckCircle2 className="h-4 w-4 text-neutral-400" aria-hidden="true" />
             </div>
             <div className="mt-3 flex items-baseline justify-between">
@@ -285,16 +303,98 @@ export default function HomePage() {
                 style={{ width: `${completionPercent}%`, transition: "width 500ms ease" }}
               />
             </div>
+            {nextRecommendedModule && (
+              <p className="mt-2.5 line-clamp-1 text-xs text-neutral-300">
+                Berikutnya: <span className="font-semibold text-emerald-400">Modul #{nextRecommendedModule.moduleNumber} — {nextRecommendedModule.title}</span>
+              </p>
+            )}
           </div>
           <div className="mt-4 pt-3 border-t border-neutral-800">
             <Link
-              href="/education"
+              href={nextRecommendedModule ? `/education?module=${nextRecommendedModule.id}` : "/education"}
               className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-300 hover:text-white transition-colors"
             >
-              <span>{completedCount > 0 ? "Lanjutkan Pembelajaran" : "Mulai Modul Pertama"}</span>
+              <span>
+                {nextRecommendedModule
+                  ? completedCount > 0
+                    ? `Lanjutkan Belajar: Modul #${nextRecommendedModule.moduleNumber}`
+                    : `Mulai dari sini: Modul #${nextRecommendedModule.moduleNumber}`
+                  : "Tinjau Kembali Kurikulum"}
+              </span>
               <ArrowRight className="h-3 w-3" aria-hidden="true" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Lanjutkan Belajar Spotlight Card */}
+      <section aria-label="Rekomendasi modul belajar berikutnya">
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5 sm:p-6">
+          {nextRecommendedModule ? (
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-0.5 font-semibold text-emerald-300">
+                    <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{completedCount === 0 ? "Mulai dari sini" : "Lanjutkan belajar"}</span>
+                  </span>
+                  <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 font-medium text-neutral-300">
+                    Langkah {nextStepNumber} dari {sequentialModules.length}
+                  </span>
+                  <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 font-medium text-neutral-400">
+                    Modul #{nextRecommendedModule.moduleNumber} · {nextRecommendedModule.category} ({nextRecommendedModule.level})
+                  </span>
+                </div>
+                <h2 className="text-lg font-bold text-white sm:text-xl">
+                  {nextRecommendedModule.title}
+                </h2>
+                <p className="max-w-3xl text-xs leading-relaxed text-neutral-300 sm:text-sm">
+                  {nextRecommendedModule.summary}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <Link
+                  href={`/education?module=${nextRecommendedModule.id}`}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-bold text-neutral-950 shadow-sm transition-colors hover:bg-emerald-400"
+                >
+                  <span>
+                    {completedCount === 0
+                      ? `Mulai Modul #${nextRecommendedModule.moduleNumber}`
+                      : `Lanjutkan Modul #${nextRecommendedModule.moduleNumber}`}
+                  </span>
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/education"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-2.5 text-xs font-medium text-neutral-300 transition-colors hover:border-neutral-700 hover:text-white"
+                >
+                  <span>Semua Modul ({EDUCATION_MODULES.length})</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-0.5 text-xs font-semibold text-emerald-300">
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Semua Modul Selesai</span>
+                </span>
+                <h2 className="mt-2 text-lg font-bold text-white">
+                  Seluruh {EDUCATION_MODULES.length} modul telah Anda selesaikan
+                </h2>
+                <p className="mt-1 text-xs text-neutral-300">
+                  Buka kembali pusat edukasi kapan saja untuk mengulang materi dan studi kasus.
+                </p>
+              </div>
+              <Link
+                href="/education"
+                className="inline-flex items-center gap-2 rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-2.5 text-xs font-semibold text-white hover:bg-neutral-800"
+              >
+                <span>Buka Pusat Edukasi</span>
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -319,7 +419,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {(Object.keys(ASSET_OVERVIEW) as AssetCategory[]).map((asset) => {
+          {PILLAR_ASSET_CATEGORIES.map((asset) => {
             const item = ASSET_OVERVIEW[asset];
             const Icon = ASSET_ICONS[asset];
             return (

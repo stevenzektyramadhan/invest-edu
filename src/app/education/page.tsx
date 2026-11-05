@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ASSET_OVERVIEW,
   EDUCATION_MODULES,
+  getNextRecommendedModule,
+  getSequentialLearningModules,
+  hasCompletedCategoryPrerequisites,
   type AssetCategory,
   type DifficultyLevel,
   type EducationModule,
@@ -61,6 +64,16 @@ export default function EducationPage() {
           }
         } catch {
           localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const moduleParam = params.get("module");
+      if (moduleParam) {
+        const matched = EDUCATION_MODULES.find((mod) => mod.id === moduleParam);
+        if (matched) {
+          setQuizAnswers(new Map());
+          setActiveModule(matched);
         }
       }
 
@@ -130,6 +143,19 @@ export default function EducationPage() {
     []
   );
 
+  const sequentialModules = useMemo(() => getSequentialLearningModules(), []);
+  const nextRecommendedModule = useMemo(
+    () => getNextRecommendedModule(completedIds),
+    [completedIds]
+  );
+  const nextRecommendedStepIndex = useMemo(
+    () =>
+      nextRecommendedModule
+        ? sequentialModules.findIndex((mod) => mod.id === nextRecommendedModule.id)
+        : -1,
+    [nextRecommendedModule, sequentialModules]
+  );
+
   const filteredModules = useMemo(() => {
     const normalizedSearch = searchQuery.trim().toLowerCase();
 
@@ -146,10 +172,10 @@ export default function EducationPage() {
   }, [searchQuery, selectedCategory, selectedLevel]);
 
   const activeModuleIndex = activeModule
-    ? EDUCATION_MODULES.findIndex((module) => module.id === activeModule.id)
+    ? sequentialModules.findIndex((module) => module.id === activeModule.id)
     : -1;
-  const previousModule = activeModuleIndex > 0 ? EDUCATION_MODULES.at(activeModuleIndex - 1) : undefined;
-  const nextModule = activeModuleIndex >= 0 ? EDUCATION_MODULES.at(activeModuleIndex + 1) : undefined;
+  const previousModule = activeModuleIndex > 0 ? sequentialModules.at(activeModuleIndex - 1) : undefined;
+  const nextModule = activeModuleIndex >= 0 ? sequentialModules.at(activeModuleIndex + 1) : undefined;
   const correctAnswers = activeModule
     ? activeModule.quizzes.reduce(
         (score, question, questionIndex) =>
@@ -268,6 +294,77 @@ export default function EducationPage() {
         </div>
       </section>
 
+      <section
+        aria-label="Mulai dari sini"
+        className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5 sm:p-6"
+      >
+        {nextRecommendedModule ? (
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-0.5 font-semibold text-emerald-300">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>{completedIds.length === 0 ? "Mulai dari sini" : "Mulai dari sini · Lanjutkan belajar"}</span>
+                </span>
+                <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 font-medium text-neutral-300">
+                  Langkah {nextRecommendedStepIndex + 1} dari {sequentialModules.length}
+                </span>
+                <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 font-medium text-neutral-400">
+                  Modul #{nextRecommendedModule.moduleNumber} · {nextRecommendedModule.category} ({nextRecommendedModule.level})
+                </span>
+              </div>
+              <h2 className="text-lg font-bold text-white sm:text-xl">
+                {nextRecommendedModule.title}
+              </h2>
+              <p className="max-w-3xl text-xs leading-relaxed text-neutral-300 sm:text-sm">
+                {nextRecommendedModule.summary}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-neutral-400">
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                  {nextRecommendedModule.readTime}
+                </span>
+                <span>•</span>
+                <span>
+                  Jalur belajar berurutan: 3 modul fondasi → Reksa Dana Pemula → Emas Pemula → Saham Pemula → Kripto Pemula → Menengah &amp; Lanjutan
+                </span>
+              </div>
+            </div>
+
+            <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => openModule(nextRecommendedModule)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-bold text-neutral-950 shadow-sm transition-colors hover:bg-emerald-400 sm:w-auto"
+              >
+                <BookOpen className="h-4 w-4" aria-hidden="true" />
+                <span>
+                  {completedIds.length === 0
+                    ? `Mulai Modul #${nextRecommendedModule.moduleNumber}`
+                    : `Lanjutkan Modul #${nextRecommendedModule.moduleNumber}`}
+                </span>
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-0.5 text-xs font-semibold text-emerald-300">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Seluruh Jalur Belajar Selesai</span>
+              </div>
+              <h2 className="mt-2 text-lg font-bold text-white">
+                Anda telah menyelesaikan seluruh {EDUCATION_MODULES.length} modul kurikulum!
+              </h2>
+              <p className="mt-1 text-xs text-neutral-300">
+                Anda tetap dapat membuka kembali modul mana saja untuk meninjau studi kasus dan kuis kapan pun diperlukan.
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
+
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-neutral-300">
           Fondasi Keuangan &amp; Karakteristik Instrumen Utama
@@ -365,13 +462,21 @@ export default function EducationPage() {
       <section aria-label="Daftar modul pembelajaran" className="grid gap-4 md:grid-cols-2">
         {filteredModules.map((module) => {
           const isCompleted = completedIds.includes(module.id);
+          const isRecommendedNext = nextRecommendedModule?.id === module.id;
+          const needsPrerequisiteNotice =
+            module.level === "Lanjutan" &&
+            !hasCompletedCategoryPrerequisites(module, completedIds);
 
           return (
             <button
               key={module.id}
               type="button"
               onClick={() => openModule(module)}
-              className="group rounded-2xl border border-neutral-800 bg-panel p-5 text-left transition-colors hover:border-neutral-600 hover:bg-panel-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
+              className={`group rounded-2xl border p-5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 ${
+                isRecommendedNext
+                  ? "border-emerald-500/40 bg-panel hover:border-emerald-400/60 hover:bg-panel-elevated"
+                  : "border-neutral-800 bg-panel hover:border-neutral-600 hover:bg-panel-elevated"
+              }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
@@ -384,6 +489,11 @@ export default function EducationPage() {
                   <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 text-xs font-medium text-neutral-400">
                     {module.level}
                   </span>
+                  {isRecommendedNext && (
+                    <span className="rounded-md border border-emerald-500/40 bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+                      {completedIds.length === 0 ? "Mulai dari sini" : "Berikutnya"}
+                    </span>
+                  )}
                 </div>
                 {isCompleted && (
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
@@ -400,6 +510,12 @@ export default function EducationPage() {
                 {module.title}
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-neutral-400">{module.summary}</p>
+
+              {needsPrerequisiteNotice && (
+                <div className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-200">
+                  Disarankan menyelesaikan modul Pemula &amp; Menengah di kategori ini terlebih dahulu
+                </div>
+              )}
 
               <div className="mt-4 grid gap-2 border-t border-neutral-800/80 pt-3 text-xs sm:grid-cols-2">
                 <span className="inline-flex items-center gap-1.5 text-neutral-400">

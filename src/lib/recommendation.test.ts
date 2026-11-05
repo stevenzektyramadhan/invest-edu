@@ -31,6 +31,12 @@ import {
   type RiskAnswers,
 } from "./recommendation";
 import {
+  EDUCATION_MODULES,
+  getNextRecommendedModule,
+  getSequentialLearningModules,
+  hasCompletedCategoryPrerequisites,
+} from "../data/education";
+import {
   evaluateAlarms,
   generateOHLCCandles,
   type PriceAlarm,
@@ -502,5 +508,33 @@ const guestRiskFallback = mergeUserStates(
   { riskState: { answers: { income: 2 } } }
 );
 assert.deepEqual(guestRiskFallback.riskState, { answers: { income: 2 } });
+
+const sequentialPath = getSequentialLearningModules();
+assert.equal(sequentialPath.length, EDUCATION_MODULES.length);
+assert.equal(sequentialPath[0]?.id, "dasar-tujuan-dana-darurat");
+assert.equal(sequentialPath[1]?.id, "dasar-inflasi-bunga-majemuk");
+assert.equal(sequentialPath[2]?.id, "dasar-waspada-bodong-pinjol");
+assert.equal(sequentialPath[3]?.id, "reksadana-dasar");
+assert.equal(sequentialPath[4]?.id, "emas-safe-haven");
+assert.equal(sequentialPath[5]?.id, "saham-fundamental");
+
+const firstRecommended = getNextRecommendedModule([]);
+assert.equal(firstRecommended?.id, "dasar-tujuan-dana-darurat");
+const secondRecommended = getNextRecommendedModule(["dasar-tujuan-dana-darurat"]);
+assert.equal(secondRecommended?.id, "dasar-inflasi-bunga-majemuk");
+
+const lanjutanReksadana = EDUCATION_MODULES.find(
+  (m) => m.id === "reksadana-obligasi-lanjutan"
+);
+assert.ok(lanjutanReksadana);
+assert.equal(hasCompletedCategoryPrerequisites(lanjutanReksadana, []), false);
+assert.equal(
+  hasCompletedCategoryPrerequisites(lanjutanReksadana, [
+    "reksadana-dasar",
+    "reksadana-seleksi",
+    "reksadana-sbn-ritel",
+  ]),
+  true
+);
 
 console.log("self-check passed: allocation, alarms, auth, and user state verified");

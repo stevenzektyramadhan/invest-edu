@@ -343,9 +343,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. Tampilkan bagian "Mulai dari sini" di `/education` dan kartu "Lanjutkan belajar" di `/` yang menunjuk modul berikutnya yang belum selesai (berdasarkan `investedu_completed_modules`).
 3. Gunakan **rekomendasi lunak**, bukan penguncian keras: modul lanjutan tetap bisa dibuka dengan label "Disarankan setelah menyelesaikan dasar".
 **Acceptance criteria**:
-- [ ] Pengguna baru melihat modul fondasi sebagai langkah pertama.
-- [ ] Setelah menyelesaikan satu modul, kartu "Lanjutkan belajar" menunjuk modul berikutnya.
-- [ ] Sinkronisasi state guest/akun tetap berjalan.
+- [x] Pengguna baru melihat modul fondasi sebagai langkah pertama.
+- [x] Setelah menyelesaikan satu modul, kartu "Lanjutkan belajar" menunjuk modul berikutnya.
+- [x] Sinkronisasi state guest/akun tetap berjalan.
 
 ### Task 4.3 — Judul berbahasa awam
 **Tujuan**: Judul seperti "Mean PBV Standard Deviation", "MVRV Z-Score", "Real Yield US Treasury", "Tokenomics" tidak cocok untuk target awam.
@@ -486,7 +486,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 3.4 — Konsistensi teks | ✅ Done | Persentase `tacticalActions` dihitung dinamis dari `allocation`, label contoh ilustrasi pada BTC/ETH, tanpa klaim "mesin alokasi ... mengoptimalkan" |
 | 3.5 — Audit regulator | ✅ Done | Seluruh 9 penyebutan `Bappebti`/`OJK` dicatat di `docs/regulatory-audit.md` (`TODO(owner): verifikasi di sumber resmi`) tanpa mengubah isi teks |
 | 4.1 — Modul fondasi | ✅ Done | Kategori `"Dasar"` + 3 modul fondasi Pemula (`dasar-tujuan-dana-darurat`, `dasar-inflasi-bunga-majemuk`, `dasar-waspada-bodong-pinjol`); `TODO(owner)` review draf |
-| 4.2 — Jalur belajar | ⏳ Pending | Dependency 4.1 |
+| 4.2 — Jalur belajar | ✅ Done | `getSequentialLearningModules`, `getNextRecommendedModule`, bagian "Mulai dari sini" di `/education`, kartu "Lanjutkan belajar" di `/`, & label rekomendasi lunak pada modul Lanjutan |
 | 4.3 — Judul awam (`plainTitle`) | ⏳ Pending | |
 | 4.4 — Tautan rekomendasi → modul | ⏳ Pending | Dependency 4.1 |
 | 4.5 — Kesegaran & sumber modul | ⏳ Pending | |
