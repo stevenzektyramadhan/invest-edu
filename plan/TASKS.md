@@ -310,8 +310,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 2. **Jangan mengubah isi dulu.** Tulis daftar temuan ke `docs/regulatory-audit.md` dengan kolom: lokasi, kalimat saat ini, regulator yang tertulis, `TODO(owner): verifikasi di sumber resmi`.
 3. Setelah pemilik memverifikasi (ojk.go.id, bappebti.go.id, kemenkeu.go.id), perbarui teksnya.
 **Acceptance criteria**:
-- [ ] `docs/regulatory-audit.md` memuat seluruh penyebutan.
-- [ ] Tidak ada teks regulator yang diubah tanpa verifikasi pemilik.
+- [x] `docs/regulatory-audit.md` memuat seluruh penyebutan.
+- [x] Tidak ada teks regulator yang diubah tanpa verifikasi pemilik.
 
 ---
 
@@ -484,7 +484,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 3.2 — Skenario & worst-case rupiah | ✅ Done | Skenario buruk/dasar/baik, `ASSET_SCENARIO_ASSUMPTIONS` (`source`/`period` bertanda `TODO(owner)`), & penurunan terburuk dalam Rupiah |
 | 3.3 — Rasional personal | ✅ Done | Daftar `reasons` bahasa awam per jawaban kuesioner & `rationale` satu kalimat yang merujuk `reasons` |
 | 3.4 — Konsistensi teks | ✅ Done | Persentase `tacticalActions` dihitung dinamis dari `allocation`, label contoh ilustrasi pada BTC/ETH, tanpa klaim "mesin alokasi ... mengoptimalkan" |
-| 3.5 — Audit regulator | ⏳ Pending | Menunggu verifikasi pemilik |
+| 3.5 — Audit regulator | ✅ Done | Seluruh 9 penyebutan `Bappebti`/`OJK` dicatat di `docs/regulatory-audit.md` (`TODO(owner): verifikasi di sumber resmi`) tanpa mengubah isi teks |
 | 4.1 — Modul fondasi | ⏳ Pending | Konten butuh review pemilik |
 | 4.2 — Jalur belajar | ⏳ Pending | Dependency 4.1 |
 | 4.3 — Judul awam (`plainTitle`) | ⏳ Pending | |
