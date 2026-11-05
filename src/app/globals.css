@@ -1,22 +1,59 @@
+/* Hallmark · genre: modern-minimal */
 @import "tailwindcss";
 
 :root {
-  --background: #020617;
-  --foreground: #f1f5f9;
+  --background: #090a0b;
+  --foreground: #ededed;
+  --panel: #111215;
+  --panel-elevated: #16181d;
+  --panel-border: #22242a;
+  --terminal-bg: #090a0b;
+  --terminal-pane: #111215;
+  --terminal-border: #1f2127;
+  --terminal-text: #d4d4d8;
+  --terminal-up: #10b981;
+  --terminal-down: #f43f5e;
+  --grid-dot: rgba(255, 255, 255, 0.05);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-panel: var(--panel);
+  --color-panel-elevated: var(--panel-elevated);
+  --color-panel-border: var(--panel-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 html,
 body {
-  background-color: #020617;
-  color: #f1f5f9;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: clip;
+}
+
+button:active:not(:disabled),
+a:active {
+  transform: translateY(0.5px);
+}
+
+.bg-grid-workstation {
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+  }
 }
 
 .tv-modal-grid {
@@ -30,14 +67,14 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid #2a2e39;
-  background-color: #131722;
+  border-bottom: 1px solid var(--terminal-border);
+  background-color: var(--terminal-bg);
 }
 
 .tv-modal-alarm-pane {
   min-width: 0;
   width: 100%;
-  background-color: #1e222d;
+  background-color: var(--terminal-pane);
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -51,7 +88,7 @@ body {
 
   .tv-modal-chart-pane {
     border-bottom: 0;
-    border-right: 1px solid #2a2e39;
+    border-right: 1px solid var(--terminal-border);
   }
 
   .tv-modal-alarm-pane {

@@ -519,27 +519,27 @@ export default function TradingTerminalModal({
     >
       <div
         style={{ maxHeight: "92vh", width: "min(1200px, 96vw)" }}
-        className="flex flex-col rounded-xl border border-[#2a2e39] bg-[#131722] text-[#d1d4dc] shadow-2xl overflow-hidden"
+        className="flex flex-col rounded-xl border border-slate-800 bg-slate-950 text-slate-200 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-[#2a2e39] bg-[#1e222d] px-4 py-2.5">
+        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-900 px-4 py-2.5">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 pr-3 border-r border-[#2a2e39]">
+            <div className="flex items-center gap-2 pr-3 border-r border-slate-800">
               <span className="text-base font-extrabold tracking-tight text-white">
                 {item.symbol}
               </span>
-              <span className="rounded bg-[#2a2e39] px-1.5 py-0.5 text-[10px] font-semibold text-[#9598a1]">
+              <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400">
                 {item.category}
               </span>
             </div>
 
-            <div className="flex items-baseline gap-2 pr-3 border-r border-[#2a2e39]">
+            <div className="flex items-baseline gap-2 pr-3 border-r border-slate-800">
               <span className="text-base font-extrabold font-mono text-white">
                 {item.priceDisplay}
               </span>
               <span
                 className={`inline-flex items-center gap-0.5 text-xs font-bold font-mono ${
-                  isUp ? "text-[#26a69a]" : "text-[#ef5350]"
+                  isUp ? "text-emerald-400" : "text-rose-400"
                 }`}
               >
                 {isUp ? (
@@ -552,7 +552,7 @@ export default function TradingTerminalModal({
               </span>
             </div>
 
-            <div className="flex items-center gap-1 pr-3 border-r border-[#2a2e39]">
+            <div className="flex items-center gap-1 pr-3 border-r border-slate-800">
               {(["1D", "1W", "1M", "1Y"] as const).map((tf) => (
                 <button
                   key={tf}
@@ -561,8 +561,8 @@ export default function TradingTerminalModal({
                   disabled={chartStyle === "TV_LIVE"}
                   className={`rounded px-2 py-1 text-xs font-bold transition-colors ${
                     timeframe === tf && chartStyle !== "TV_LIVE"
-                      ? "bg-[#2962ff] text-white"
-                      : "text-[#9598a1] hover:bg-[#2a2e39] hover:text-white disabled:opacity-35"
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-35"
                   }`}
                 >
                   {tf}
@@ -576,11 +576,11 @@ export default function TradingTerminalModal({
                 onClick={() => setChartStyle("CANDLE")}
                 className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
                   chartStyle === "CANDLE"
-                    ? "bg-[#2a2e39] text-white"
-                    : "text-[#9598a1] hover:bg-[#2a2e39]/60 hover:text-white"
+                    ? "bg-slate-800 text-white"
+                    : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
                 }`}
               >
-                <CandlestickChart className="h-3.5 w-3.5 text-[#26a69a]" />
+                <CandlestickChart className="h-3.5 w-3.5 text-emerald-400" />
                 <span>Candlestick</span>
               </button>
               <button
@@ -588,11 +588,11 @@ export default function TradingTerminalModal({
                 onClick={() => setChartStyle("LINE")}
                 className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
                   chartStyle === "LINE"
-                    ? "bg-[#2a2e39] text-white"
-                    : "text-[#9598a1] hover:bg-[#2a2e39]/60 hover:text-white"
+                    ? "bg-slate-800 text-white"
+                    : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
                 }`}
               >
-                <LineChart className="h-3.5 w-3.5 text-[#2962ff]" />
+                <LineChart className="h-3.5 w-3.5 text-sky-400" />
                 <span>Line</span>
               </button>
               <button
@@ -600,8 +600,8 @@ export default function TradingTerminalModal({
                 onClick={() => setChartStyle("TV_LIVE")}
                 className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
                   chartStyle === "TV_LIVE"
-                    ? "bg-[#2962ff] text-white"
-                    : "text-[#9598a1] hover:bg-[#2a2e39]/60 hover:text-white"
+                    ? "bg-sky-600 text-white"
+                    : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
                 }`}
               >
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -613,7 +613,7 @@ export default function TradingTerminalModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-[#9598a1] hover:bg-[#2a2e39] hover:text-white transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
             aria-label="Tutup"
           >
             <X className="h-5 w-5" />
@@ -625,44 +625,44 @@ export default function TradingTerminalModal({
             <div className="tv-modal-chart-pane">
               <div
                 style={{ minHeight: "420px" }}
-                className="relative w-full h-[440px] bg-[#131722] select-none overflow-hidden"
+                className="relative w-full h-[440px] bg-slate-950 select-none overflow-hidden"
               >
                 {chartStyle !== "TV_LIVE" && displayCandle && (
-                  <div className="pointer-events-none absolute top-2.5 left-3 z-20 flex flex-wrap items-center gap-x-3 gap-y-1 rounded bg-[#131722]/90 px-2.5 py-1 text-[11px] font-mono border border-[#2a2e39]/90 shadow">
+                  <div className="pointer-events-none absolute top-2.5 left-3 z-20 flex flex-wrap items-center gap-x-3 gap-y-1 rounded bg-slate-900/90 px-2.5 py-1 text-[11px] font-mono border border-slate-800 shadow">
                     <span className="font-sans font-bold text-white">
                       {item.name} ({ timeframe })
                     </span>
-                    <span className="text-[#9598a1]">
+                    <span className="text-slate-400">
                       O{" "}
                       <strong className="text-white">
                         {formatCompactAxisPrice(displayCandle.open)}
                       </strong>
                     </span>
-                    <span className="text-[#9598a1]">
+                    <span className="text-slate-400">
                       H{" "}
-                      <strong className="text-[#26a69a]">
+                      <strong className="text-emerald-400">
                         {formatCompactAxisPrice(displayCandle.high)}
                       </strong>
                     </span>
-                    <span className="text-[#9598a1]">
+                    <span className="text-slate-400">
                       L{" "}
-                      <strong className="text-[#ef5350]">
+                      <strong className="text-rose-400">
                         {formatCompactAxisPrice(displayCandle.low)}
                       </strong>
                     </span>
-                    <span className="text-[#9598a1]">
+                    <span className="text-slate-400">
                       C{" "}
                       <strong
                         className={
                           displayCandle.close >= displayCandle.open
-                            ? "text-[#26a69a]"
-                            : "text-[#ef5350]"
+                            ? "text-emerald-400"
+                            : "text-rose-400"
                         }
                       >
                         {formatCompactAxisPrice(displayCandle.close)}
                       </strong>
                     </span>
-                    <span className="text-[#f59e0b] font-semibold">
+                    <span className="text-amber-400 font-semibold">
                       MA(5) {formatCompactAxisPrice(displayCandle.ma5)}
                     </span>
                   </div>
@@ -687,34 +687,34 @@ export default function TradingTerminalModal({
                 )}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-[#2a2e39] bg-[#1e222d] text-xs divide-y sm:divide-y-0 sm:divide-x divide-[#2a2e39]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-slate-800 bg-slate-900 text-xs divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
                 <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
-                  <span className="text-[#9598a1]">24h High</span>
-                  <span className="font-mono font-bold text-[#26a69a]">
+                  <span className="text-slate-400">24h High</span>
+                  <span className="font-mono font-bold text-emerald-400">
                     {formatCompactAxisPrice(item.high24h)}
                   </span>
                 </div>
                 <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
-                  <span className="text-[#9598a1]">24h Low</span>
-                  <span className="font-mono font-bold text-[#ef5350]">
+                  <span className="text-slate-400">24h Low</span>
+                  <span className="font-mono font-bold text-rose-400">
                     {formatCompactAxisPrice(item.low24h)}
                   </span>
                 </div>
                 <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
-                  <span className="text-[#9598a1]">Support Beli</span>
-                  <span className="font-mono font-bold text-[#26a69a]">
+                  <span className="text-slate-400">Support Beli</span>
+                  <span className="font-mono font-bold text-emerald-400">
                     {formatCompactAxisPrice(item.supportLevel)}
                   </span>
                 </div>
                 <div className="px-3.5 py-2.5 flex items-center justify-between gap-2">
-                  <span className="text-[#9598a1]">Resistance</span>
-                  <span className="font-mono font-bold text-[#f59e0b]">
+                  <span className="text-slate-400">Resistance</span>
+                  <span className="font-mono font-bold text-amber-400">
                     {formatCompactAxisPrice(item.resistanceLevel)}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 border-t border-[#2a2e39] bg-[#131722] px-4 py-3 text-xs text-[#9598a1]">
+              <div className="flex items-start gap-2.5 border-t border-slate-800 bg-slate-950 px-4 py-3 text-xs text-slate-400">
                 <ShieldAlert className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white">Analisis Edukasi:</strong>{" "}
@@ -726,17 +726,17 @@ export default function TradingTerminalModal({
             <div className="tv-modal-alarm-pane">
               <form
                 onSubmit={handleSubmitAlarm}
-                className="rounded-lg border border-[#2a2e39] bg-[#131722] p-3.5 space-y-3.5"
+                className="rounded-lg border border-slate-800 bg-slate-950 p-3.5 space-y-3.5"
               >
-                <div className="flex items-center gap-2 border-b border-[#2a2e39] pb-2.5">
+                <div className="flex items-center gap-2 border-b border-slate-800 pb-2.5">
                   <Bell className="h-4 w-4 text-amber-400 shrink-0" />
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-white">
+                  <h3 className="text-xs font-bold text-white">
                     Mode Alarm Target Harga
                   </h3>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#9598a1] mb-1.5">
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1.5">
                     Pilih Arah Trigger
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -749,16 +749,16 @@ export default function TradingTerminalModal({
                           "Cicil beli bertahap (Buy on Dip -2%)"
                         )
                       }
-                      className={`rounded-lg border p-2.5 text-left transition-all ${
+                      className={`rounded-lg border p-2.5 text-left transition-colors ${
                         condition === "BELOW"
-                          ? "border-[#26a69a] bg-[#26a69a]/15 text-white"
-                          : "border-[#2a2e39] bg-[#1e222d] text-[#9598a1] hover:text-white"
+                          ? "border-emerald-500/50 bg-emerald-500/15 text-white"
+                          : "border-slate-800 bg-slate-900 text-slate-400 hover:text-white"
                       }`}
                     >
-                      <div className="text-xs font-bold text-[#26a69a]">
+                      <div className="text-xs font-bold text-emerald-400">
                         Target Beli (≤)
                       </div>
-                      <div className="mt-0.5 text-[10px] text-[#9598a1]">
+                      <div className="mt-0.5 text-[10px] text-slate-400">
                         Saat harga diskon
                       </div>
                     </button>
@@ -772,16 +772,16 @@ export default function TradingTerminalModal({
                           "Take Profit / Rebalancing"
                         )
                       }
-                      className={`rounded-lg border p-2.5 text-left transition-all ${
+                      className={`rounded-lg border p-2.5 text-left transition-colors ${
                         condition === "ABOVE"
-                          ? "border-[#a855f7] bg-[#a855f7]/15 text-white"
-                          : "border-[#2a2e39] bg-[#1e222d] text-[#9598a1] hover:text-white"
+                          ? "border-purple-500/50 bg-purple-500/15 text-white"
+                          : "border-slate-800 bg-slate-900 text-slate-400 hover:text-white"
                       }`}
                     >
-                      <div className="text-xs font-bold text-[#c084fc]">
+                      <div className="text-xs font-bold text-purple-400">
                         Target Jual (≥)
                       </div>
-                      <div className="mt-0.5 text-[10px] text-[#9598a1]">
+                      <div className="mt-0.5 text-[10px] text-slate-400">
                         Saat harga naik
                       </div>
                     </button>
@@ -789,10 +789,10 @@ export default function TradingTerminalModal({
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between text-[11px] text-[#9598a1] mb-1.5">
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
                     <span>Quick-Pick Level:</span>
-                    <span className="font-mono text-white">
-                      Now: {formatCompactAxisPrice(item.rawPrice)}
+                    <span className="text-white">
+                      Now: <span className="font-mono">{formatCompactAxisPrice(item.rawPrice)}</span>
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -805,7 +805,7 @@ export default function TradingTerminalModal({
                           "Akumulasi diskon -2%"
                         )
                       }
-                      className="flex-1 min-w-[68px] rounded border border-[#2a2e39] bg-[#1e222d] px-2 py-1.5 text-[11px] font-semibold text-sky-400 hover:border-sky-500/50"
+                      className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-sky-400 hover:border-sky-500/50 transition-colors"
                     >
                       Diskon -2%
                     </button>
@@ -818,7 +818,7 @@ export default function TradingTerminalModal({
                           "Buy the Dip -5%"
                         )
                       }
-                      className="flex-1 min-w-[68px] rounded border border-[#2a2e39] bg-[#1e222d] px-2 py-1.5 text-[11px] font-semibold text-sky-400 hover:border-sky-500/50"
+                      className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-sky-400 hover:border-sky-500/50 transition-colors"
                     >
                       Diskon -5%
                     </button>
@@ -831,7 +831,7 @@ export default function TradingTerminalModal({
                           "Beli di Support Kuat"
                         )
                       }
-                      className="flex-1 min-w-[68px] rounded border border-[#2a2e39] bg-[#1e222d] px-2 py-1.5 text-[11px] font-semibold text-[#26a69a] hover:border-[#26a69a]/50"
+                      className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-emerald-400 hover:border-emerald-500/50 transition-colors"
                     >
                       Support
                     </button>
@@ -844,7 +844,7 @@ export default function TradingTerminalModal({
                           "Take Profit di Resistance"
                         )
                       }
-                      className="flex-1 min-w-[68px] rounded border border-[#2a2e39] bg-[#1e222d] px-2 py-1.5 text-[11px] font-semibold text-amber-400 hover:border-amber-500/50"
+                      className="flex-1 min-w-[68px] rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-[11px] font-semibold text-amber-400 hover:border-amber-500/50 transition-colors"
                     >
                       Resistance
                     </button>
@@ -852,7 +852,7 @@ export default function TradingTerminalModal({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#9598a1] mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
                     Nominal Target ({item.unitPrefix.trim() || item.unitSuffix.trim() || "Harga"})
                   </label>
                   <input
@@ -861,12 +861,12 @@ export default function TradingTerminalModal({
                     required
                     value={targetInput}
                     onChange={(e) => setTargetInput(e.target.value)}
-                    className="w-full rounded-lg border border-[#2a2e39] bg-[#1e222d] px-3 py-2 text-sm font-mono font-bold text-white focus:border-[#2962ff] focus:outline-none"
+                    className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm font-mono font-bold text-white focus:border-sky-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#9598a1] mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
                     Catatan Rencana
                   </label>
                   <input
@@ -874,20 +874,20 @@ export default function TradingTerminalModal({
                     value={noteInput}
                     onChange={(e) => setNoteInput(e.target.value)}
                     placeholder="Contoh: Cicil beli 30% dana kas"
-                    className="w-full rounded-lg border border-[#2a2e39] bg-[#1e222d] px-3 py-2 text-xs text-white focus:border-[#2962ff] focus:outline-none"
+                    className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white focus:border-sky-500 focus:outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#2962ff] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#1e53e5] transition-colors shadow"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-sky-500 transition-colors shadow"
                 >
                   <Bell className="h-4 w-4 shrink-0" />
                   <span>Pasang Alarm Target Sekarang</span>
                 </button>
               </form>
 
-              <div className="rounded-lg border border-[#2a2e39] bg-[#131722] p-3.5 space-y-3">
+              <div className="rounded-lg border border-slate-800 bg-slate-950 p-3.5 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white">
                     <BellRing className="h-3.5 w-3.5 text-amber-400" />
@@ -909,8 +909,8 @@ export default function TradingTerminalModal({
                 </div>
 
                 {assetAlarms.length === 0 ? (
-                  <div className="rounded border border-dashed border-[#2a2e39] bg-[#1e222d]/50 p-4 text-center">
-                    <p className="text-xs text-[#9598a1]">
+                  <div className="rounded border border-dashed border-slate-800 bg-slate-900/50 p-4 text-center">
+                    <p className="text-xs text-slate-400">
                       Belum ada alarm aktif untuk {item.symbol}.
                     </p>
                   </div>
@@ -921,12 +921,12 @@ export default function TradingTerminalModal({
                         key={alarm.id}
                         className={`flex items-center justify-between gap-2 rounded-lg border p-2.5 text-xs ${
                           alarm.triggered
-                            ? "border-[#26a69a] bg-[#26a69a]/15"
-                            : "border-[#2a2e39] bg-[#1e222d]"
+                            ? "border-emerald-500/50 bg-emerald-500/15"
+                            : "border-slate-800 bg-slate-900"
                         }`}
                       >
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-1.5 font-mono font-bold text-white">
+                          <div className="flex flex-wrap items-center gap-1.5 font-bold text-white">
                             <span
                               className={
                                 alarm.condition === "BELOW"
@@ -936,7 +936,7 @@ export default function TradingTerminalModal({
                             >
                               {alarm.condition === "BELOW" ? "BELI ≤" : "JUAL ≥"}
                             </span>
-                            <span>
+                            <span className="font-mono">
                               {formatTargetValue(
                                 alarm.targetPrice,
                                 alarm.unitPrefix,
@@ -944,13 +944,13 @@ export default function TradingTerminalModal({
                               )}
                             </span>
                             {alarm.triggered && (
-                              <span className="inline-flex items-center gap-0.5 rounded bg-[#26a69a] px-1.5 py-0.5 font-sans text-[9px] font-extrabold text-white">
+                              <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold text-slate-950">
                                 <CheckCircle2 className="h-2.5 w-2.5" />
-                                HIT
+                                Tercapai
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-[#9598a1] truncate mt-0.5">
+                          <p className="text-[11px] text-slate-400 truncate mt-0.5">
                             {alarm.note}
                           </p>
                         </div>
@@ -958,7 +958,7 @@ export default function TradingTerminalModal({
                         <button
                           type="button"
                           onClick={() => onDeleteAlarm(alarm.id)}
-                          className="shrink-0 rounded p-1.5 text-[#9598a1] hover:bg-[#ef5350]/15 hover:text-[#ef5350]"
+                          className="shrink-0 rounded p-1.5 text-slate-400 hover:bg-rose-500/15 hover:text-rose-400"
                           title="Hapus Alarm"
                         >
                           <Trash2 className="h-3.5 w-3.5" />

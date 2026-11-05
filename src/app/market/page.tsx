@@ -25,6 +25,7 @@ import {
   Trash2,
   Volume2,
   CheckCircle2,
+  PlayCircle,
 } from "lucide-react";
 import {
   ALARMS_STORAGE_KEY as SYNC_ALARMS_STORAGE_KEY,
@@ -89,18 +90,17 @@ function Sparkline({ data, positive }: { data: number[]; positive: boolean }) {
     })
     .join(" ");
 
-  const strokeColor = positive ? "#10b981" : "#f43f5e";
-
   return (
     <svg
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className="overflow-visible"
+      className={`overflow-visible ${positive ? "text-emerald-500" : "text-rose-500"}`}
+      aria-hidden="true"
     >
       <polyline
         fill="none"
-        stroke={strokeColor}
+        stroke="currentColor"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -312,8 +312,8 @@ export default function MarketDashboardPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded bg-amber-400 px-2 py-0.5 text-[10px] font-extrabold uppercase text-slate-950">
-                  ALARM TARGET TERCAPAI!
+                <span className="rounded bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
+                  Target Tercapai
                 </span>
                 <span className="text-sm font-extrabold text-white">
                   {triggeredBanner.symbol} ({triggeredBanner.assetName})
@@ -353,46 +353,52 @@ export default function MarketDashboardPage() {
       )}
 
       {/* Header */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950/40 p-6 sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative overflow-hidden rounded-xl border border-neutral-800 bg-panel p-6 sm:p-8">
+        <div className="absolute inset-0 bg-grid-workstation opacity-20 pointer-events-none" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-400 border border-sky-500/20">
-              <Activity className="h-3.5 w-3.5" />
-              <span>Multi-Asset Market Monitor & Price Alert</span>
+            <div className="inline-flex items-center gap-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1 text-xs font-medium text-neutral-300">
+              <Activity className="h-3.5 w-3.5 text-neutral-400" />
+              <span>Multi-Asset Market Monitor &amp; Price Alert</span>
             </div>
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Dashboard Pergerakan Pasar Hari Ini
+              Dashboard Pergerakan Pasar Real-Time
             </h1>
-            <p className="mt-1 max-w-2xl text-sm text-slate-400">
+            <p className="mt-1 max-w-2xl text-sm text-neutral-400">
               Klik salah satu instrumen di bawah untuk membuka{" "}
-              <strong className="text-sky-400">
-                Grafik Terminal ala TradingView
+              <strong className="text-neutral-200 font-semibold">
+                Grafik Terminal TradingView
               </strong>{" "}
               dan memasang{" "}
-              <strong className="text-amber-400">
+              <strong className="text-neutral-200 font-semibold">
                 Alarm Target Harga Beli / Jual
               </strong>
               .
             </p>
           </div>
 
-          <div className="flex flex-col items-start sm:items-end gap-2">
+          <div className="flex flex-col items-start sm:items-end gap-2.5">
             <button
               onClick={fetchMarket}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-semibold text-white shadow hover:bg-sky-500 disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-2 rounded-md bg-neutral-100 px-4 py-2 text-xs font-semibold text-neutral-950 shadow-sm hover:bg-white disabled:opacity-50 transition-colors"
             >
               <RefreshCw
                 className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
               />
               <span>{loading ? "Memuat Data..." : "Perbarui Harga"}</span>
             </button>
-            <div className="flex items-center gap-2 text-[11px] text-slate-400">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  isLive ? "bg-emerald-400" : "bg-amber-400"
-                }`}
-              />
+            <div className="flex items-center gap-2 text-xs text-neutral-400">
+              <span className="relative flex h-2 w-2">
+                {isLive && (
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 animate-ping motion-reduce:animate-none" />
+                )}
+                <span
+                  className={`relative inline-flex h-2 w-2 rounded-full ${
+                    isLive ? "bg-emerald-500" : "bg-neutral-500"
+                  }`}
+                />
+              </span>
               <span>
                 {isLive ? "Live Public API" : "Market Proxy Snapshot"} •{" "}
                 {updatedAt || "--:--"}
@@ -403,17 +409,17 @@ export default function MarketDashboardPage() {
       </div>
 
       {/* Active Price Alarms Bar */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+      <section className="rounded-xl border border-neutral-800 bg-panel p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-neutral-800 text-neutral-300 border border-neutral-700">
               <Bell className="h-4 w-4" />
             </div>
             <div>
               <h2 className="text-sm font-bold text-white">
                 Mode Alarm Target Harga ({alarms.length} Terpasang)
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-400">
                 Pasang target harga beli saat diskon (Buy the Dip) atau target
                 ambil untung pada aset pilihan Anda.
               </p>
@@ -423,9 +429,9 @@ export default function MarketDashboardPage() {
           <button
             type="button"
             onClick={playAlarmChime}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-amber-500/40 hover:text-amber-300"
+            className="inline-flex items-center gap-1.5 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-600 hover:text-white"
           >
-            <Volume2 className="h-3.5 w-3.5 text-amber-400" />
+            <Volume2 className="h-3.5 w-3.5 text-neutral-400" />
             <span>Tes Suara Alarm</span>
           </button>
         </div>
@@ -435,10 +441,10 @@ export default function MarketDashboardPage() {
             {alarms.map((alarm) => (
               <div
                 key={alarm.id}
-                className={`flex items-center justify-between gap-3 rounded-xl border p-3 transition-all ${
+                className={`flex items-center justify-between gap-3 rounded-lg border p-3 transition-colors ${
                   alarm.triggered
-                    ? "border-emerald-500/50 bg-emerald-500/10"
-                    : "border-slate-800 bg-slate-950/60"
+                    ? "border-emerald-500/40 bg-emerald-500/10"
+                    : "border-neutral-800 bg-background"
                 }`}
               >
                 <div
@@ -446,16 +452,10 @@ export default function MarketDashboardPage() {
                   className="cursor-pointer flex-1"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold text-white">
+                    <span className="text-xs font-bold text-white">
                       {alarm.symbol}
                     </span>
-                    <span
-                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                        alarm.condition === "BELOW"
-                          ? "bg-sky-500/20 text-sky-400"
-                          : "bg-purple-500/20 text-purple-400"
-                      }`}
-                    >
+                    <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300">
                       {alarm.condition === "BELOW" ? "Beli ≤" : "Jual ≥"}{" "}
                       {formatTargetValue(
                         alarm.targetPrice,
@@ -464,13 +464,13 @@ export default function MarketDashboardPage() {
                       )}
                     </span>
                     {alarm.triggered && (
-                      <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-extrabold text-slate-950">
+                      <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold text-neutral-950">
                         <CheckCircle2 className="h-2.5 w-2.5" />
                         AKTIF
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 text-[11px] text-slate-400 line-clamp-1">
+                  <p className="mt-1 text-[11px] text-neutral-400 line-clamp-1">
                     {alarm.note}
                   </p>
                 </div>
@@ -482,19 +482,19 @@ export default function MarketDashboardPage() {
                       onClick={() =>
                         handleSimulatePriceHit(alarm.assetId, alarm.targetPrice)
                       }
-                      className="rounded-lg bg-amber-500/15 px-2 py-1 text-[10px] font-semibold text-amber-300 hover:bg-amber-500/25"
-                      title="Simulasikan harga menyentuh target ini"
+                      title="Simulasikan pergerakan harga menyentuh target alarm ini"
+                      className="rounded p-1 text-neutral-400 hover:bg-neutral-800 hover:text-white"
                     >
-                      Uji
+                      <PlayCircle className="h-4 w-4" />
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => handleDeleteAlarm(alarm.id)}
-                    className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-500/10 hover:text-rose-400"
-                    title="Hapus Alarm"
+                    title="Hapus alarm ini"
+                    className="rounded p-1 text-neutral-500 hover:bg-neutral-800 hover:text-rose-400"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -505,22 +505,22 @@ export default function MarketDashboardPage() {
 
       {/* Macroeconomic Indicators Strip */}
       <section className="space-y-2.5">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          <Globe className="h-3.5 w-3.5 text-sky-400" />
+        <div className="flex items-center gap-2 text-xs font-medium text-neutral-400">
+          <Globe className="h-3.5 w-3.5 text-neutral-400" />
           <span>Indikator Makroekonomi Acuan</span>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {macroIndicators.map((ind) => (
             <div
               key={ind.label}
-              className="rounded-xl border border-slate-800 bg-slate-900/60 p-4"
+              className="rounded-lg border border-neutral-800 bg-panel p-4"
             >
-              <div className="text-xs text-slate-400">{ind.label}</div>
+              <div className="text-xs text-neutral-400">{ind.label}</div>
               <div className="mt-1 flex items-baseline justify-between">
-                <span className="text-lg font-extrabold text-white">
+                <span className="text-lg font-bold text-white">
                   {ind.value}
                 </span>
-                <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-sky-400">
+                <span className="rounded bg-neutral-800 px-2 py-0.5 text-[10px] font-medium text-neutral-300">
                   {ind.status}
                 </span>
               </div>
@@ -535,10 +535,10 @@ export default function MarketDashboardPage() {
           <button
             key={cat}
             onClick={() => setSelectedCat(cat)}
-            className={`rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${
+            className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
               selectedCat === cat
-                ? "bg-sky-500 text-white"
-                : "border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white"
+                ? "bg-neutral-100 text-neutral-950 font-semibold shadow-sm"
+                : "border border-neutral-800 bg-panel text-neutral-400 hover:border-neutral-700 hover:text-white"
             }`}
           >
             {cat}
@@ -558,32 +558,40 @@ export default function MarketDashboardPage() {
             <div
               key={item.id}
               onClick={() => setActiveTerminalId(item.id)}
-              className="group cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/50 p-5 transition-all hover:border-sky-500/60 hover:bg-slate-900/90 hover:shadow-lg hover:shadow-sky-500/5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setActiveTerminalId(item.id);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              className="group cursor-pointer rounded-xl border border-neutral-800 bg-panel p-5 transition-colors hover:border-neutral-700 hover:bg-panel-elevated focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-400"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-base font-extrabold text-white group-hover:text-sky-400 transition-colors">
+                    <span className="text-base font-bold text-white group-hover:text-neutral-200 transition-colors">
                       {item.symbol}
                     </span>
-                    <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-300">
+                    <span className="rounded border border-neutral-800 bg-neutral-900 px-2 py-0.5 text-xs text-neutral-400">
                       {item.category}
                     </span>
                     {itemAlarmsCount > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                      <span className="inline-flex items-center gap-1 rounded border border-neutral-700 bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-300">
                         <BellRing className="h-3 w-3" />
-                        {itemAlarmsCount} Alarm
+                        <span>{itemAlarmsCount} Alarm</span>
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-xs text-slate-400">{item.name}</p>
+                  <p className="mt-1 text-xs text-neutral-400">{item.name}</p>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-lg font-extrabold text-white">
+                  <div className="text-xl font-bold text-white">
                     {item.priceDisplay}
                   </div>
-                  <div className="mt-0.5 flex items-center justify-end gap-2 text-xs font-semibold">
+                  <div className="mt-1 flex items-center justify-end gap-2 text-xs font-semibold">
                     <span
                       className={`inline-flex items-center gap-0.5 ${
                         isUp ? "text-emerald-400" : "text-rose-400"
@@ -595,9 +603,9 @@ export default function MarketDashboardPage() {
                         <TrendingDown className="h-3.5 w-3.5" />
                       )}
                       {isUp ? "+" : ""}
-                      {item.change24h}% (24h)
+                      {item.change24h}% (24j)
                     </span>
-                    <span className="text-slate-500">•</span>
+                    <span className="text-neutral-600">•</span>
                     <span
                       className={
                         item.change7d >= 0
@@ -606,36 +614,36 @@ export default function MarketDashboardPage() {
                       }
                     >
                       {item.change7d >= 0 ? "+" : ""}
-                      {item.change7d}% (7d)
+                      {item.change7d}% (7h)
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Sparkline & Note */}
-              <div className="mt-4 flex flex-col gap-3 border-t border-slate-800/80 pt-3.5 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-2 text-xs text-slate-400 max-w-xs">
-                  <Info className="h-3.5 w-3.5 text-sky-400 shrink-0 mt-0.5" />
-                  <span>{item.educationalNote}</span>
+              <div className="mt-4 flex flex-col gap-3 border-t border-neutral-800 pt-3.5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-2 text-xs text-neutral-400 max-w-xs">
+                  <Info className="h-3.5 w-3.5 text-neutral-400 shrink-0 mt-0.5" />
+                  <span className="line-clamp-2">{item.educationalNote}</span>
                 </div>
                 <div className="flex flex-col items-end shrink-0">
                   <Sparkline
                     data={item.sparkline}
                     positive={item.change7d >= 0}
                   />
-                  <span className="text-[10px] text-slate-500">
+                  <span className="mt-1 text-[11px] text-neutral-500">
                     Tren 7 Hari ({item.source})
                   </span>
                 </div>
               </div>
 
               {/* Action Bar for TradingView & Alarm */}
-              <div className="mt-3.5 flex items-center justify-between rounded-xl bg-slate-950/70 px-3.5 py-2 text-xs border border-slate-800/80 group-hover:border-sky-500/30">
-                <span className="inline-flex items-center gap-1.5 font-semibold text-sky-400">
-                  <CandlestickChart className="h-3.5 w-3.5" />
-                  <span>Buka Grafik TradingView & Support/Resistance</span>
+              <div className="mt-3.5 flex items-center justify-between rounded-lg bg-background px-3.5 py-2 text-xs border border-neutral-800 group-hover:border-neutral-700">
+                <span className="inline-flex items-center gap-1.5 font-medium text-neutral-300">
+                  <CandlestickChart className="h-3.5 w-3.5 text-neutral-400" />
+                  <span>Buka Terminal Grafik</span>
                 </span>
-                <span className="inline-flex items-center gap-1 font-semibold text-amber-400">
+                <span className="inline-flex items-center gap-1 font-medium text-neutral-400">
                   <Bell className="h-3.5 w-3.5" />
                   <span>Pasang Alarm</span>
                 </span>
@@ -646,21 +654,21 @@ export default function MarketDashboardPage() {
       </div>
 
       {/* Educational Insight Box */}
-      <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-5 sm:p-6">
-        <div className="flex items-center gap-2 text-sm font-bold text-sky-400">
-          <BarChart3 className="h-4 w-4" />
+      <div className="rounded-xl border border-neutral-800 bg-panel p-5 sm:p-6">
+        <div className="flex items-center gap-2 text-sm font-bold text-neutral-200">
+          <BarChart3 className="h-4 w-4 text-neutral-400" />
           <span>Cara Membaca Dashboard Pasar untuk Investor Jangka Panjang</span>
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-slate-300">
+        <p className="mt-2 text-xs leading-relaxed text-neutral-400">
           Fluktuasi harian (24 jam) adalah hal wajar di pasar modal. Gunakan
           fitur <strong>Mode Alarm Target Harga</strong> dengan mengklik salah
           satu aset di atas untuk memasang pengingat beli di area{" "}
-          <strong>Support (Diskon)</strong>, sehingga Anda bisa melakukan
+          <strong className="text-neutral-200">Support (Diskon)</strong>, sehingga Anda bisa melakukan
           akumulasi bertahap <strong>Dollar Cost Averaging (DCA)</strong> secara
           disiplin sesuai{" "}
           <a
             href="/recommendation"
-            className="font-semibold text-sky-400 underline hover:text-sky-300"
+            className="font-medium text-neutral-200 underline hover:text-white"
           >
             Rekomendasi Profil Risiko
           </a>{" "}

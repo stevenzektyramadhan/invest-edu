@@ -207,28 +207,29 @@ export default function EducationPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950/40 p-6 sm:p-8">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <section className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-panel p-6 sm:p-8">
+        <div className="absolute inset-0 bg-grid-workstation opacity-20 pointer-events-none" />
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-400">
-              <BookOpen className="h-3.5 w-3.5" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/80 px-3 py-1 text-xs font-medium text-neutral-300">
+              <BookOpen className="h-3.5 w-3.5 text-neutral-400" />
               <span>Kurikulum Multi-Aset Terstruktur</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Pusat Edukasi Instrumen Investasi
             </h1>
-            <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
+            <p className="max-w-2xl text-sm leading-relaxed text-neutral-400">
               Belajar dari fondasi hingga strategi lanjutan dengan studi kasus Rupiah,
               red flags, checklist eksekusi, dan kuis pemahaman pada setiap modul.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3">
+          <div className="flex items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 py-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-xs text-slate-400">Progres Belajar</div>
+              <div className="text-xs text-neutral-400">Progres Belajar</div>
               <div className="text-base font-bold text-white">
                 {completedIds.length} / {EDUCATION_MODULES.length} Modul Selesai
               </div>
@@ -236,30 +237,30 @@ export default function EducationPage() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 border-t border-slate-800/80 pt-5 lg:grid-cols-[0.7fr_1.5fr_1.2fr]">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Kurikulum</div>
+        <div className="mt-6 grid gap-3 border-t border-neutral-800/80 pt-5 lg:grid-cols-[0.7fr_1.5fr_1.2fr]">
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4">
+            <div className="text-xs font-medium text-neutral-400">Total Kurikulum</div>
             <div className="mt-1 text-3xl font-bold text-white">{EDUCATION_MODULES.length}</div>
-            <p className="mt-1 text-xs text-slate-400">modul mendalam dan berurutan</p>
+            <p className="mt-1 text-xs text-neutral-500">modul mendalam dan berurutan</p>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Menurut Kelas Aset</div>
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4">
+            <div className="text-xs font-medium text-neutral-400">Menurut Kelas Aset</div>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {categoryBreakdown.map(({ category, count }) => (
-                <div key={category} className="rounded-lg bg-slate-900 px-2.5 py-2">
-                  <div className="text-[11px] text-slate-400">{category}</div>
-                  <div className="mt-0.5 text-sm font-bold text-sky-400">{count} modul</div>
+                <div key={category} className="rounded-lg bg-neutral-950/80 border border-neutral-800/60 px-2.5 py-2">
+                  <div className="text-[11px] text-neutral-400">{category}</div>
+                  <div className="mt-0.5 text-sm font-bold text-neutral-100">{count} modul</div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Menurut Tingkat</div>
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4">
+            <div className="text-xs font-medium text-neutral-400">Menurut Tingkat</div>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {levelBreakdown.map(({ level, count }) => (
-                <div key={level} className="rounded-lg bg-slate-900 px-2.5 py-2">
-                  <div className="text-[11px] text-slate-400">{level}</div>
-                  <div className="mt-0.5 text-sm font-bold text-emerald-400">{count} modul</div>
+                <div key={level} className="rounded-lg bg-neutral-950/80 border border-neutral-800/60 px-2.5 py-2">
+                  <div className="text-[11px] text-neutral-400">{level}</div>
+                  <div className="mt-0.5 text-sm font-bold text-neutral-200">{count} modul</div>
                 </div>
               ))}
             </div>
@@ -268,7 +269,7 @@ export default function EducationPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+        <h2 className="text-sm font-semibold text-neutral-300">
           Komparasi Karakteristik 4 Instrumen Utama
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -281,27 +282,27 @@ export default function EducationPage() {
                 key={asset}
                 type="button"
                 onClick={() => setSelectedCategory(isSelected ? "Semua" : asset)}
-                className={`rounded-xl border p-4 text-left transition-all ${
+                className={`rounded-xl border p-4 text-left transition-colors ${
                   isSelected
-                    ? "border-sky-500 bg-sky-500/10 shadow-lg shadow-sky-500/10"
-                    : "border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-900"
+                    ? "border-neutral-400 bg-neutral-800/50 shadow-md shadow-black/40"
+                    : "border-neutral-800 bg-panel hover:border-neutral-700 hover:bg-neutral-900/80"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-base font-bold text-white">{asset}</span>
-                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-300">
+                  <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2 py-0.5 text-[11px] font-medium text-neutral-300">
                     Risiko: {info.riskProfile}
                   </span>
                 </div>
-                <p className="mt-2 line-clamp-2 text-xs text-slate-400">{info.tagline}</p>
-                <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-800/80 pt-3 text-[11px]">
+                <p className="mt-2 line-clamp-2 text-xs text-neutral-400">{info.tagline}</p>
+                <div className="mt-4 grid grid-cols-2 gap-2 border-t border-neutral-800/80 pt-3 text-[11px]">
                   <div>
-                    <span className="block text-slate-500">Target Return</span>
+                    <span className="block text-neutral-500">Target Return</span>
                     <span className="font-semibold text-emerald-400">{info.expectedReturn}</span>
                   </div>
                   <div>
-                    <span className="block text-slate-500">Horizon</span>
-                    <span className="font-semibold text-slate-200">{info.horizon}</span>
+                    <span className="block text-neutral-500">Horizon</span>
+                    <span className="font-semibold text-neutral-200">{info.horizon}</span>
                   </div>
                 </div>
               </button>
@@ -310,7 +311,7 @@ export default function EducationPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-4 rounded-xl border border-slate-800 bg-slate-900/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-4 rounded-xl border border-neutral-800 bg-panel p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-1.5">
           {CATEGORY_FILTERS.map((category) => (
             <button
@@ -319,8 +320,8 @@ export default function EducationPage() {
               onClick={() => setSelectedCategory(category)}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                 selectedCategory === category
-                  ? "bg-sky-500 text-white"
-                  : "bg-slate-800/80 text-slate-400 hover:text-white"
+                  ? "bg-neutral-100 text-neutral-950 font-bold"
+                  : "bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800"
               }`}
             >
               {category}
@@ -329,8 +330,8 @@ export default function EducationPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1">
-            <Filter className="h-3.5 w-3.5 text-slate-500" />
+          <div className="flex flex-wrap items-center gap-1 rounded-lg border border-neutral-800 bg-neutral-950 px-2.5 py-1">
+            <Filter className="h-3.5 w-3.5 text-neutral-500" />
             {LEVEL_FILTERS.map((level) => (
               <button
                 key={level}
@@ -338,8 +339,8 @@ export default function EducationPage() {
                 onClick={() => setSelectedLevel(level)}
                 className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
                   selectedLevel === level
-                    ? "bg-slate-800 text-sky-400"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-neutral-800 text-white font-semibold"
+                    : "text-neutral-400 hover:text-neutral-200"
                 }`}
               >
                 {level}
@@ -349,13 +350,13 @@ export default function EducationPage() {
 
           <label className="relative flex-1 sm:w-56 sm:flex-initial">
             <span className="sr-only">Cari modul</span>
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" />
+            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-neutral-500" />
             <input
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Cari modul atau topik..."
-              className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none"
+              className="w-full rounded-lg border border-neutral-800 bg-neutral-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-neutral-500 focus:border-neutral-500 focus:outline-none"
             />
           </label>
         </div>
@@ -370,56 +371,56 @@ export default function EducationPage() {
               key={module.id}
               type="button"
               onClick={() => openModule(module)}
-              className="group rounded-2xl border border-slate-800 bg-slate-900/50 p-5 text-left transition-all hover:border-sky-500/50 hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+              className="group rounded-2xl border border-neutral-800 bg-panel p-5 text-left transition-colors hover:border-neutral-600 hover:bg-panel-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-md border border-sky-500/20 bg-sky-500/15 px-2.5 py-0.5 text-xs font-semibold text-sky-400">
+                  <span className="rounded-md border border-neutral-700 bg-neutral-800/80 px-2.5 py-0.5 text-xs font-semibold text-neutral-200">
                     Modul #{module.moduleNumber}
                   </span>
-                  <span className="rounded-md bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                  <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 text-xs font-medium text-neutral-400">
                     {module.category}
                   </span>
-                  <span className="rounded-md bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                  <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 text-xs font-medium text-neutral-400">
                     {module.level}
                   </span>
                 </div>
                 {isCompleted && (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
                     <CheckCircle2 className="h-3 w-3" /> Selesai
                   </span>
                 )}
               </div>
 
-              <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-amber-400">
-                <Sparkles className="h-3.5 w-3.5" />
+              <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-neutral-300">
+                <Sparkles className="h-3.5 w-3.5 text-neutral-400" />
                 <span>{module.subTopic}</span>
               </div>
-              <h3 className="mt-1.5 text-lg font-bold leading-snug text-white transition-colors group-hover:text-sky-400">
+              <h3 className="mt-1.5 text-lg font-bold leading-snug text-white transition-colors group-hover:text-neutral-200">
                 {module.title}
               </h3>
-              <p className="mt-2 text-xs leading-relaxed text-slate-400">{module.summary}</p>
+              <p className="mt-2 text-xs leading-relaxed text-neutral-400">{module.summary}</p>
 
-              <div className="mt-4 grid gap-2 border-t border-slate-800/80 pt-3 text-xs sm:grid-cols-2">
-                <span className="inline-flex items-center gap-1.5 text-slate-400">
-                  <Clock className="h-3.5 w-3.5 text-sky-400" />
+              <div className="mt-4 grid gap-2 border-t border-neutral-800/80 pt-3 text-xs sm:grid-cols-2">
+                <span className="inline-flex items-center gap-1.5 text-neutral-400">
+                  <Clock className="h-3.5 w-3.5 text-neutral-500" />
                   {module.readTime}
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-slate-400">
-                  <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
-                  Risiko: <strong className="text-slate-200">{module.riskRating}</strong>
+                <span className="inline-flex items-center gap-1.5 text-neutral-400">
+                  <ShieldAlert className="h-3.5 w-3.5 text-neutral-500" />
+                  Risiko: <strong className="text-neutral-200">{module.riskRating}</strong>
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-emerald-400">
+                <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
                   <Calculator className="h-3.5 w-3.5" />
                   Studi Kasus Rupiah
                 </span>
-                <span className="inline-flex items-center gap-1.5 font-medium text-slate-400">
+                <span className="inline-flex items-center gap-1.5 font-medium text-neutral-400">
                   {module.sections.length} bagian materi · {module.quizzes.length} soal kuis
                 </span>
               </div>
 
-              <span className="mt-4 inline-flex items-center gap-1 font-semibold text-sky-400 transition-transform group-hover:translate-x-0.5">
-                Pelajari Modul <ChevronRight className="h-4 w-4" />
+              <span className="mt-4 inline-flex items-center gap-1 font-semibold text-white transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none">
+                Pelajari Modul <ChevronRight className="h-4 w-4 text-neutral-400" />
               </span>
             </button>
           );
@@ -445,22 +446,22 @@ export default function EducationPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="education-dialog-title"
-            className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl"
+            className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-neutral-800 bg-background shadow-2xl"
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <div className="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/95 px-5 py-4 backdrop-blur sm:px-7">
+            <div className="sticky top-0 z-10 border-b border-neutral-800 bg-background/95 px-5 py-4 backdrop-blur sm:px-7">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded-md bg-sky-500/15 px-2.5 py-0.5 font-semibold text-sky-400">
+                    <span className="rounded-md border border-neutral-700 bg-neutral-800 px-2.5 py-0.5 font-semibold text-neutral-200">
                       {activeModule.category}
                     </span>
-                    <span className="rounded-md bg-slate-800 px-2.5 py-0.5 text-slate-300">
+                    <span className="rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 text-neutral-400">
                       Level {activeModule.level}
                     </span>
-                    <span className="text-slate-400">{activeModule.readTime}</span>
+                    <span className="text-neutral-500">{activeModule.readTime}</span>
                   </div>
-                  <div className="mt-2 text-xs font-semibold text-amber-400">{activeModule.subTopic}</div>
+                  <div className="mt-2 text-xs font-semibold text-neutral-400">{activeModule.subTopic}</div>
                   <h2 id="education-dialog-title" className="mt-1 text-lg font-bold leading-snug text-white sm:text-xl">
                     Modul #{activeModule.moduleNumber}: {activeModule.title}
                   </h2>
@@ -468,15 +469,15 @@ export default function EducationPage() {
                 <button
                   type="button"
                   onClick={() => setActiveModule(null)}
-                  className="shrink-0 rounded-lg bg-slate-900 p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  className="shrink-0 rounded-lg bg-neutral-900 border border-neutral-800 p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
                   aria-label="Tutup modul"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-800 pt-3">
-                <span className="text-xs font-medium text-slate-400">
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-neutral-800 pt-3">
+                <span className="text-xs font-medium text-neutral-400">
                   Modul {activeModuleIndex + 1} dari {EDUCATION_MODULES.length}
                 </span>
                 <div className="flex gap-2">
@@ -484,7 +485,7 @@ export default function EducationPage() {
                     type="button"
                     disabled={!previousModule}
                     onClick={() => previousModule && navigateToModule(previousModule)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-300 transition-colors hover:border-slate-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex items-center gap-1 rounded-lg border border-neutral-800 bg-neutral-900 px-2.5 py-1.5 text-xs font-semibold text-neutral-300 transition-colors hover:border-neutral-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" /> Sebelumnya
                   </button>
@@ -492,7 +493,7 @@ export default function EducationPage() {
                     type="button"
                     disabled={!nextModule}
                     onClick={() => nextModule && navigateToModule(nextModule)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1.5 text-xs font-semibold text-sky-400 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex items-center gap-1 rounded-lg border border-neutral-700 bg-neutral-800 px-2.5 py-1.5 text-xs font-semibold text-neutral-100 transition-colors hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Selanjutnya <ChevronRight className="h-3.5 w-3.5" />
                   </button>
@@ -501,15 +502,15 @@ export default function EducationPage() {
             </div>
 
             <div className="space-y-8 px-5 py-6 sm:px-7">
-              <section className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-400">
-                  <Sparkles className="h-4 w-4" />
+              <section className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold text-neutral-300">
+                  <Sparkles className="h-4 w-4 text-neutral-400" />
                   Intisari Penting (Key Takeaways)
                 </div>
-                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300">
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-neutral-300">
                   {activeModule.keyTakeaways.map((takeaway) => (
                     <li key={takeaway} className="flex items-start gap-2">
-                      <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
+                      <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
                       <span>{takeaway}</span>
                     </li>
                   ))}
@@ -517,20 +518,20 @@ export default function EducationPage() {
               </section>
 
               <section aria-labelledby="materi-lengkap">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
-                  <BookOpen className="h-4 w-4 text-sky-400" />
+                <div className="flex items-center gap-2 text-xs font-semibold text-neutral-200">
+                  <BookOpen className="h-4 w-4 text-neutral-400" />
                   <h3 id="materi-lengkap">Materi Lengkap</h3>
                 </div>
                 <div className="mt-4 space-y-4">
                   {activeModule.sections.map((section, sectionIndex) => (
-                    <article key={section.heading} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 sm:p-5">
+                    <article key={section.heading} className="rounded-xl border border-neutral-800 bg-panel p-4 sm:p-5">
                       <div className="flex items-start gap-3">
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-sky-400">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-800 border border-neutral-700 text-xs font-bold text-neutral-200">
                           {sectionIndex + 1}
                         </span>
                         <div>
                           <h4 className="text-base font-bold text-white">{section.heading}</h4>
-                          <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-300">{section.body}</p>
+                          <p className="mt-2 whitespace-pre-line text-sm leading-7 text-neutral-300">{section.body}</p>
                         </div>
                       </div>
                     </article>
@@ -539,13 +540,13 @@ export default function EducationPage() {
               </section>
 
               <section className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5" aria-labelledby="studi-kasus">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
                   <Calculator className="h-4 w-4" />
                   <h3 id="studi-kasus">Studi Kasus & Simulasi Hitungan Nyata</h3>
                 </div>
                 <h4 className="mt-3 text-lg font-bold text-white">{activeModule.caseStudy.title}</h4>
-                <p className="mt-2 text-sm leading-7 text-slate-300">{activeModule.caseStudy.scenario}</p>
-                <ol className="mt-4 space-y-2 rounded-lg border border-emerald-500/20 bg-slate-950/70 p-3 font-mono text-xs leading-6 text-emerald-300 sm:p-4">
+                <p className="mt-2 text-sm leading-7 text-neutral-300">{activeModule.caseStudy.scenario}</p>
+                <ol className="mt-4 space-y-2 rounded-lg border border-emerald-500/20 bg-neutral-950/80 p-3 font-mono text-xs leading-6 text-emerald-300 sm:p-4">
                   {activeModule.caseStudy.calculation.map((step, calculationIndex) => (
                     <li key={step} className="flex gap-2">
                       <span className="select-none text-emerald-500">{calculationIndex + 1}.</span>
@@ -561,11 +562,11 @@ export default function EducationPage() {
 
               <section className="grid gap-4 lg:grid-cols-2">
                 <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 sm:p-5">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-400">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-rose-400">
                     <AlertTriangle className="h-4 w-4" />
                     Kesalahan Umum yang Wajib Dihindari
                   </div>
-                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-slate-300">
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-300">
                     {activeModule.redFlags.map((redFlag) => (
                       <li key={redFlag} className="flex items-start gap-2">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400" />
@@ -575,11 +576,11 @@ export default function EducationPage() {
                   </ul>
                 </div>
                 <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
                     <ListChecks className="h-4 w-4" />
                     Checklist Langkah Praktis
                   </div>
-                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-slate-300">
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-300">
                     {activeModule.actionChecklist.map((item) => (
                       <li key={item} className="flex items-start gap-2">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
@@ -590,13 +591,13 @@ export default function EducationPage() {
                 </div>
               </section>
 
-              <section className="rounded-xl border border-amber-500/20 bg-slate-900/70 p-4 sm:p-5" aria-labelledby="uji-pemahaman">
+              <section className="rounded-xl border border-neutral-800 bg-panel p-4 sm:p-5" aria-labelledby="uji-pemahaman">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">
-                    <HelpCircle className="h-4 w-4" />
+                  <div className="flex items-center gap-2 text-xs font-semibold text-neutral-200">
+                    <HelpCircle className="h-4 w-4 text-neutral-400" />
                     <h3 id="uji-pemahaman">Uji Pemahaman</h3>
                   </div>
-                  <div aria-live="polite" className="rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-300">
+                  <div aria-live="polite" className="rounded-full border border-neutral-800 bg-neutral-950 px-3 py-1 text-xs font-semibold text-neutral-300">
                     {correctAnswers} / {activeModule.quizzes.length} Benar
                   </div>
                 </div>
@@ -671,18 +672,18 @@ export default function EducationPage() {
                 )}
               </section>
 
-              <div className="flex flex-col-reverse gap-3 border-t border-slate-800 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col-reverse gap-3 border-t border-neutral-800 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <button
                   type="button"
                   onClick={() => setActiveModule(null)}
-                  className="rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-400 transition-colors hover:bg-slate-900 hover:text-white"
+                  className="rounded-lg px-4 py-2.5 text-xs font-semibold text-neutral-400 transition-colors hover:bg-neutral-900 hover:text-white"
                 >
                   Tutup dan Lanjutkan Nanti
                 </button>
                 <button
                   type="button"
                   onClick={finishModule}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-sky-500"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-neutral-100 px-4 py-2.5 text-xs font-bold text-neutral-950 transition-colors hover:bg-white"
                 >
                   <CheckCircle2 className="h-4 w-4" />
                   {nextModule ? "Tandai Selesai & Lanjut" : "Tandai Selesai & Tutup"}
