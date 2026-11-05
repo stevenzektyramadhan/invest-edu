@@ -1,0 +1,697 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import {
+  ASSET_OVERVIEW,
+  EDUCATION_MODULES,
+  type AssetCategory,
+  type DifficultyLevel,
+  type EducationModule,
+} from "@/data/education";
+import {
+  AlertTriangle,
+  Calculator,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  Clock,
+  Filter,
+  HelpCircle,
+  ListChecks,
+  Search,
+  ShieldAlert,
+  Sparkles,
+  X,
+  BookOpen,
+} from "lucide-react";
+import {
+  MODULES_STORAGE_KEY,
+  SYNC_EVENT_NAME,
+  pushUserStateToCloud,
+} from "@/lib/user-sync";
+
+const STORAGE_KEY = MODULES_STORAGE_KEY;
+const ASSET_CATEGORIES: AssetCategory[] = ["Reksa Dana", "Emas", "Saham", "Kripto"];
+const DIFFICULTY_LEVELS: DifficultyLevel[] = ["Pemula", "Menengah", "Lanjutan"];
+const CATEGORY_FILTERS: ("Semua" | AssetCategory)[] = ["Semua", ...ASSET_CATEGORIES];
+const LEVEL_FILTERS: ("Semua" | DifficultyLevel)[] = ["Semua", ...DIFFICULTY_LEVELS];
+
+export default function EducationPage() {
+  const [selectedCategory, setSelectedCategory] = useState<"Semua" | AssetCategory>("Semua");
+  const [selectedLevel, setSelectedLevel] = useState<"Semua" | DifficultyLevel>("Semua");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeModule, setActiveModule] = useState<EducationModule | null>(null);
+  const [quizAnswers, setQuizAnswers] = useState(new Map<number, number>());
+  const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [isProgressReady, setIsProgressReady] = useState(false);
+
+  useEffect(() => {
+    const hydrationTimer = window.setTimeout(() => {
+      const savedProgress = localStorage.getItem(STORAGE_KEY);
+
+      if (savedProgress) {
+        try {
+          const parsedProgress: unknown = JSON.parse(savedProgress);
+
+          if (Array.isArray(parsedProgress) && parsedProgress.every((id) => typeof id === "string")) {
+            setCompletedIds(parsedProgress);
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        } catch {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+
+      setIsProgressReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(hydrationTimer);
+  }, []);
+
+  useEffect(() => {
+    const reloadProgress = () => {
+      const savedProgress = localStorage.getItem(STORAGE_KEY);
+      if (!savedProgress) {
+        setCompletedIds([]);
+        return;
+      }
+      try {
+        const parsed: unknown = JSON.parse(savedProgress);
+        if (Array.isArray(parsed) && parsed.every((id) => typeof id === "string")) {
+          setCompletedIds(parsed);
+        }
+      } catch {
+        setCompletedIds([]);
+      }
+    };
+    window.addEventListener(SYNC_EVENT_NAME, reloadProgress);
+    return () => window.removeEventListener(SYNC_EVENT_NAME, reloadProgress);
+  }, []);
+
+  useEffect(() => {
+    if (!isProgressReady) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(completedIds));
+  }, [completedIds, isProgressReady]);
+
+  useEffect(() => {
+    if (!activeModule) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActiveModule(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [activeModule]);
+
+  const categoryBreakdown = useMemo(
+    () =>
+      ASSET_CATEGORIES.map((category) => ({
+        category,
+        count: EDUCATION_MODULES.filter((module) => module.category === category).length,
+      })),
+    []
+  );
+
+  const levelBreakdown = useMemo(
+    () =>
+      DIFFICULTY_LEVELS.map((level) => ({
+        level,
+        count: EDUCATION_MODULES.filter((module) => module.level === level).length,
+      })),
+    []
+  );
+
+  const filteredModules = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    return EDUCATION_MODULES.filter((module) => {
+      const matchesCategory = selectedCategory === "Semua" || module.category === selectedCategory;
+      const matchesLevel = selectedLevel === "Semua" || module.level === selectedLevel;
+      const matchesSearch = [module.title, module.subTopic, module.summary, module.category]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedSearch);
+
+      return matchesCategory && matchesLevel && matchesSearch;
+    });
+  }, [searchQuery, selectedCategory, selectedLevel]);
+
+  const activeModuleIndex = activeModule
+    ? EDUCATION_MODULES.findIndex((module) => module.id === activeModule.id)
+    : -1;
+  const previousModule = activeModuleIndex > 0 ? EDUCATION_MODULES.at(activeModuleIndex - 1) : undefined;
+  const nextModule = activeModuleIndex >= 0 ? EDUCATION_MODULES.at(activeModuleIndex + 1) : undefined;
+  const correctAnswers = activeModule
+    ? activeModule.quizzes.reduce(
+        (score, question, questionIndex) =>
+          quizAnswers.get(questionIndex) === question.correctIndex ? score + 1 : score,
+        0
+      )
+    : 0;
+  const hasAnsweredAll = activeModule ? quizAnswers.size === activeModule.quizzes.length : false;
+
+  const openModule = (module: EducationModule) => {
+    setQuizAnswers(new Map());
+    setActiveModule(module);
+  };
+
+  const navigateToModule = (module: EducationModule) => {
+    setQuizAnswers(new Map());
+    setActiveModule(module);
+  };
+
+  const markComplete = (moduleId: string) => {
+    setCompletedIds((currentIds) => {
+      const nextIds = currentIds.includes(moduleId) ? currentIds : [...currentIds, moduleId];
+      if (nextIds !== currentIds) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(nextIds));
+        void pushUserStateToCloud({ completedModules: nextIds });
+      }
+      return nextIds;
+    });
+  };
+
+  const answerQuiz = (questionIndex: number, optionIndex: number) => {
+    if (!activeModule || quizAnswers.has(questionIndex)) return;
+
+    const nextAnswers = new Map(quizAnswers);
+    nextAnswers.set(questionIndex, optionIndex);
+    setQuizAnswers(nextAnswers);
+
+    if (nextAnswers.size === activeModule.quizzes.length) {
+      markComplete(activeModule.id);
+    }
+  };
+
+  const finishModule = () => {
+    if (!activeModule) return;
+
+    markComplete(activeModule.id);
+
+    if (nextModule) {
+      navigateToModule(nextModule);
+      return;
+    }
+
+    setActiveModule(null);
+  };
+
+  return (
+    <div className="space-y-8">
+      <section className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950/40 p-6 sm:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-400">
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Kurikulum Multi-Aset Terstruktur</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Pusat Edukasi Instrumen Investasi
+            </h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
+              Belajar dari fondasi hingga strategi lanjutan dengan studi kasus Rupiah,
+              red flags, checklist eksekusi, dan kuis pemahaman pada setiap modul.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-xs text-slate-400">Progres Belajar</div>
+              <div className="text-base font-bold text-white">
+                {completedIds.length} / {EDUCATION_MODULES.length} Modul Selesai
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 border-t border-slate-800/80 pt-5 lg:grid-cols-[0.7fr_1.5fr_1.2fr]">
+          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Kurikulum</div>
+            <div className="mt-1 text-3xl font-bold text-white">{EDUCATION_MODULES.length}</div>
+            <p className="mt-1 text-xs text-slate-400">modul mendalam dan berurutan</p>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Menurut Kelas Aset</div>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {categoryBreakdown.map(({ category, count }) => (
+                <div key={category} className="rounded-lg bg-slate-900 px-2.5 py-2">
+                  <div className="text-[11px] text-slate-400">{category}</div>
+                  <div className="mt-0.5 text-sm font-bold text-sky-400">{count} modul</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Menurut Tingkat</div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {levelBreakdown.map(({ level, count }) => (
+                <div key={level} className="rounded-lg bg-slate-900 px-2.5 py-2">
+                  <div className="text-[11px] text-slate-400">{level}</div>
+                  <div className="mt-0.5 text-sm font-bold text-emerald-400">{count} modul</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+          Komparasi Karakteristik 4 Instrumen Utama
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {ASSET_CATEGORIES.map((asset) => {
+            const info = ASSET_OVERVIEW[asset];
+            const isSelected = selectedCategory === asset;
+
+            return (
+              <button
+                key={asset}
+                type="button"
+                onClick={() => setSelectedCategory(isSelected ? "Semua" : asset)}
+                className={`rounded-xl border p-4 text-left transition-all ${
+                  isSelected
+                    ? "border-sky-500 bg-sky-500/10 shadow-lg shadow-sky-500/10"
+                    : "border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-900"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-base font-bold text-white">{asset}</span>
+                  <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-300">
+                    Risiko: {info.riskProfile}
+                  </span>
+                </div>
+                <p className="mt-2 line-clamp-2 text-xs text-slate-400">{info.tagline}</p>
+                <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-800/80 pt-3 text-[11px]">
+                  <div>
+                    <span className="block text-slate-500">Target Return</span>
+                    <span className="font-semibold text-emerald-400">{info.expectedReturn}</span>
+                  </div>
+                  <div>
+                    <span className="block text-slate-500">Horizon</span>
+                    <span className="font-semibold text-slate-200">{info.horizon}</span>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-xl border border-slate-800 bg-slate-900/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-1.5">
+          {CATEGORY_FILTERS.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => setSelectedCategory(category)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                selectedCategory === category
+                  ? "bg-sky-500 text-white"
+                  : "bg-slate-800/80 text-slate-400 hover:text-white"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1">
+            <Filter className="h-3.5 w-3.5 text-slate-500" />
+            {LEVEL_FILTERS.map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => setSelectedLevel(level)}
+                className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+                  selectedLevel === level
+                    ? "bg-slate-800 text-sky-400"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+
+          <label className="relative flex-1 sm:w-56 sm:flex-initial">
+            <span className="sr-only">Cari modul</span>
+            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Cari modul atau topik..."
+              className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none"
+            />
+          </label>
+        </div>
+      </section>
+
+      <section aria-label="Daftar modul pembelajaran" className="grid gap-4 md:grid-cols-2">
+        {filteredModules.map((module) => {
+          const isCompleted = completedIds.includes(module.id);
+
+          return (
+            <button
+              key={module.id}
+              type="button"
+              onClick={() => openModule(module)}
+              className="group rounded-2xl border border-slate-800 bg-slate-900/50 p-5 text-left transition-all hover:border-sky-500/50 hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-md border border-sky-500/20 bg-sky-500/15 px-2.5 py-0.5 text-xs font-semibold text-sky-400">
+                    Modul #{module.moduleNumber}
+                  </span>
+                  <span className="rounded-md bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                    {module.category}
+                  </span>
+                  <span className="rounded-md bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                    {module.level}
+                  </span>
+                </div>
+                {isCompleted && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
+                    <CheckCircle2 className="h-3 w-3" /> Selesai
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-amber-400">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>{module.subTopic}</span>
+              </div>
+              <h3 className="mt-1.5 text-lg font-bold leading-snug text-white transition-colors group-hover:text-sky-400">
+                {module.title}
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-slate-400">{module.summary}</p>
+
+              <div className="mt-4 grid gap-2 border-t border-slate-800/80 pt-3 text-xs sm:grid-cols-2">
+                <span className="inline-flex items-center gap-1.5 text-slate-400">
+                  <Clock className="h-3.5 w-3.5 text-sky-400" />
+                  {module.readTime}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-slate-400">
+                  <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
+                  Risiko: <strong className="text-slate-200">{module.riskRating}</strong>
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-emerald-400">
+                  <Calculator className="h-3.5 w-3.5" />
+                  Studi Kasus Rupiah
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-medium text-slate-400">
+                  {module.sections.length} bagian materi · {module.quizzes.length} soal kuis
+                </span>
+              </div>
+
+              <span className="mt-4 inline-flex items-center gap-1 font-semibold text-sky-400 transition-transform group-hover:translate-x-0.5">
+                Pelajari Modul <ChevronRight className="h-4 w-4" />
+              </span>
+            </button>
+          );
+        })}
+      </section>
+
+      {filteredModules.length === 0 && (
+        <section className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 px-6 py-12 text-center">
+          <Search className="mx-auto h-6 w-6 text-slate-500" />
+          <h2 className="mt-3 text-base font-bold text-white">Belum ada modul yang cocok</h2>
+          <p className="mt-1 text-sm text-slate-400">Ubah kata kunci atau longgarkan filter kelas aset dan tingkat kesulitan.</p>
+        </section>
+      )}
+
+      {activeModule && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm sm:p-5"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setActiveModule(null);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="education-dialog-title"
+            className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/95 px-5 py-4 backdrop-blur sm:px-7">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="rounded-md bg-sky-500/15 px-2.5 py-0.5 font-semibold text-sky-400">
+                      {activeModule.category}
+                    </span>
+                    <span className="rounded-md bg-slate-800 px-2.5 py-0.5 text-slate-300">
+                      Level {activeModule.level}
+                    </span>
+                    <span className="text-slate-400">{activeModule.readTime}</span>
+                  </div>
+                  <div className="mt-2 text-xs font-semibold text-amber-400">{activeModule.subTopic}</div>
+                  <h2 id="education-dialog-title" className="mt-1 text-lg font-bold leading-snug text-white sm:text-xl">
+                    Modul #{activeModule.moduleNumber}: {activeModule.title}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveModule(null)}
+                  className="shrink-0 rounded-lg bg-slate-900 p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  aria-label="Tutup modul"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-800 pt-3">
+                <span className="text-xs font-medium text-slate-400">
+                  Modul {activeModuleIndex + 1} dari {EDUCATION_MODULES.length}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={!previousModule}
+                    onClick={() => previousModule && navigateToModule(previousModule)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-300 transition-colors hover:border-slate-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" /> Sebelumnya
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!nextModule}
+                    onClick={() => nextModule && navigateToModule(nextModule)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1.5 text-xs font-semibold text-sky-400 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Selanjutnya <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8 px-5 py-6 sm:px-7">
+              <section className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-400">
+                  <Sparkles className="h-4 w-4" />
+                  Intisari Penting (Key Takeaways)
+                </div>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300">
+                  {activeModule.keyTakeaways.map((takeaway) => (
+                    <li key={takeaway} className="flex items-start gap-2">
+                      <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
+                      <span>{takeaway}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section aria-labelledby="materi-lengkap">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
+                  <BookOpen className="h-4 w-4 text-sky-400" />
+                  <h3 id="materi-lengkap">Materi Lengkap</h3>
+                </div>
+                <div className="mt-4 space-y-4">
+                  {activeModule.sections.map((section, sectionIndex) => (
+                    <article key={section.heading} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 sm:p-5">
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-sky-400">
+                          {sectionIndex + 1}
+                        </span>
+                        <div>
+                          <h4 className="text-base font-bold text-white">{section.heading}</h4>
+                          <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-300">{section.body}</p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5" aria-labelledby="studi-kasus">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  <Calculator className="h-4 w-4" />
+                  <h3 id="studi-kasus">Studi Kasus & Simulasi Hitungan Nyata</h3>
+                </div>
+                <h4 className="mt-3 text-lg font-bold text-white">{activeModule.caseStudy.title}</h4>
+                <p className="mt-2 text-sm leading-7 text-slate-300">{activeModule.caseStudy.scenario}</p>
+                <ol className="mt-4 space-y-2 rounded-lg border border-emerald-500/20 bg-slate-950/70 p-3 font-mono text-xs leading-6 text-emerald-300 sm:p-4">
+                  {activeModule.caseStudy.calculation.map((step, calculationIndex) => (
+                    <li key={step} className="flex gap-2">
+                      <span className="select-none text-emerald-500">{calculationIndex + 1}.</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-4 border-l-2 border-emerald-400 pl-3 text-sm leading-7 text-emerald-100">
+                  <strong className="text-emerald-400">Kesimpulan: </strong>
+                  {activeModule.caseStudy.conclusion}
+                </p>
+              </section>
+
+              <section className="grid gap-4 lg:grid-cols-2">
+                <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 sm:p-5">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-400">
+                    <AlertTriangle className="h-4 w-4" />
+                    Kesalahan Umum yang Wajib Dihindari
+                  </div>
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-slate-300">
+                    {activeModule.redFlags.map((redFlag) => (
+                      <li key={redFlag} className="flex items-start gap-2">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400" />
+                        <span>{redFlag}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                    <ListChecks className="h-4 w-4" />
+                    Checklist Langkah Praktis
+                  </div>
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-slate-300">
+                    {activeModule.actionChecklist.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-amber-500/20 bg-slate-900/70 p-4 sm:p-5" aria-labelledby="uji-pemahaman">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">
+                    <HelpCircle className="h-4 w-4" />
+                    <h3 id="uji-pemahaman">Uji Pemahaman</h3>
+                  </div>
+                  <div aria-live="polite" className="rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-300">
+                    {correctAnswers} / {activeModule.quizzes.length} Benar
+                  </div>
+                </div>
+
+                <p className="mt-3 text-xs leading-relaxed text-slate-400">
+                  Jawab setiap soal untuk melihat penjelasan langsung. Modul otomatis selesai setelah semua soal terjawab.
+                </p>
+
+                <div className="mt-5 space-y-6">
+                  {activeModule.quizzes.map((question, questionIndex) => {
+                    const selectedOption = quizAnswers.get(questionIndex);
+                    const hasAnswered = selectedOption !== undefined;
+                    const isCorrect = selectedOption === question.correctIndex;
+
+                    return (
+                      <article key={question.question} className="border-t border-slate-800 pt-5 first:border-t-0 first:pt-0">
+                        <div className="flex gap-3">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-xs font-bold text-amber-400">
+                            {questionIndex + 1}
+                          </span>
+                          <p className="pt-0.5 text-sm font-semibold leading-relaxed text-white">{question.question}</p>
+                        </div>
+                        <div className="mt-3 space-y-2">
+                          {question.options.map((option, optionIndex) => {
+                            const isCorrectOption = optionIndex === question.correctIndex;
+                            const isSelectedOption = optionIndex === selectedOption;
+                            let optionClass = "border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700";
+
+                            if (hasAnswered && isCorrectOption) {
+                              optionClass = "border-emerald-500/50 bg-emerald-500/15 text-emerald-200";
+                            } else if (hasAnswered && isSelectedOption) {
+                              optionClass = "border-rose-500/50 bg-rose-500/15 text-rose-200";
+                            }
+
+                            return (
+                              <button
+                                key={option}
+                                type="button"
+                                disabled={hasAnswered}
+                                onClick={() => answerQuiz(questionIndex, optionIndex)}
+                                className={`w-full rounded-lg border px-3.5 py-2.5 text-left text-xs font-medium transition-colors disabled:cursor-default ${optionClass}`}
+                              >
+                                <span className="mr-2 font-bold text-slate-500">{String.fromCharCode(65 + optionIndex)}.</span>
+                                {option}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {hasAnswered && (
+                          <div className={`mt-3 rounded-lg border p-3 text-xs leading-relaxed ${
+                            isCorrect
+                              ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-100"
+                              : "border-rose-500/20 bg-rose-500/5 text-rose-100"
+                          }`}>
+                            <strong className={isCorrect ? "text-emerald-400" : "text-rose-400"}>
+                              {isCorrect ? "Tepat. " : "Belum tepat. "}
+                            </strong>
+                            {question.explanation}
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+
+                {hasAnsweredAll && (
+                  <div className="mt-5 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs font-medium text-emerald-200">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                    Semua soal terjawab. Modul ini telah ditandai selesai.
+                  </div>
+                )}
+              </section>
+
+              <div className="flex flex-col-reverse gap-3 border-t border-slate-800 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => setActiveModule(null)}
+                  className="rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-400 transition-colors hover:bg-slate-900 hover:text-white"
+                >
+                  Tutup dan Lanjutkan Nanti
+                </button>
+                <button
+                  type="button"
+                  onClick={finishModule}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-sky-500"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  {nextModule ? "Tandai Selesai & Lanjut" : "Tandai Selesai & Tutup"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
