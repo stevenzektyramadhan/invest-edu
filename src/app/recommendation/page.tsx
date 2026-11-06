@@ -22,6 +22,8 @@ import {
   Wallet,
   CheckCircle2,
   RotateCcw,
+  Printer,
+  FlaskConical,
 } from "lucide-react";
 import {
   RISK_STORAGE_KEY,
@@ -102,27 +104,46 @@ export default function RecommendationPage() {
   return (
     <div className="space-y-8">
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-panel p-6 sm:p-8">
+      <div className="no-print relative overflow-hidden rounded-2xl border border-neutral-800 bg-panel p-6 sm:p-8">
         <div className="absolute inset-0 bg-grid-workstation opacity-20 pointer-events-none" />
-        <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/80 px-3 py-1 text-xs font-medium text-neutral-300">
-            <Compass className="h-3.5 w-3.5 text-neutral-400" />
-            <span>Smart Asset Allocation Engine</span>
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/80 px-3 py-1 text-xs font-medium text-neutral-300">
+              <Compass className="h-3.5 w-3.5 text-neutral-400" />
+              <span>Smart Asset Allocation Engine</span>
+            </div>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Rekomendasi Portofolio Berbasis Profil Risiko &amp; Ekonomi Makro
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-neutral-400">
+              Jawab 5 pertanyaan profil risiko untuk mendapatkan simulasi alokasi
+              Saham, Reksa Dana, Emas, dan Kripto yang terukur sesuai kapasitas
+              keuangan Anda.
+            </p>
           </div>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Rekomendasi Portofolio Berbasis Profil Risiko & Ekonomi Makro
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-neutral-400">
-            Jawab 5 pertanyaan profil risiko untuk mendapatkan simulasi alokasi
-            Saham, Reksa Dana, Emas, dan Kripto yang terukur sesuai kapasitas
-            keuangan Anda.
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-700 bg-neutral-800 px-3.5 py-2 text-xs font-semibold text-neutral-200 hover:border-neutral-500 hover:text-white transition-colors"
+            >
+              <Printer className="h-3.5 w-3.5" />
+              <span>Cetak / Simpan PDF</span>
+            </button>
+            <Link
+              href="/portfolio-sandbox"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3.5 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-colors"
+            >
+              <FlaskConical className="h-3.5 w-3.5" />
+              <span>Uji di Paper Sandbox</span>
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-12">
+      <div className="print-report-grid grid gap-8 lg:grid-cols-12">
         {/* Left Column: Questionnaire & Advanced Macro Selector */}
-        <div className="space-y-6 lg:col-span-7">
+        <div className="no-print space-y-6 lg:col-span-7">
           {/* Risk Questionnaire */}
           <div className="rounded-2xl border border-neutral-800 bg-panel p-5 sm:p-6 space-y-5">
             <div className="flex items-center justify-between">
@@ -244,8 +265,16 @@ export default function RecommendationPage() {
         </div>
 
         {/* Right Column: Live Portfolio Recommendation Result */}
-        <div className="space-y-6 lg:col-span-5">
-          <div className="sticky top-20 space-y-6 rounded-2xl border border-neutral-800 bg-panel p-5 sm:p-6 shadow-xl">
+        <div className="print-report-col space-y-6 lg:col-span-5">
+          <div className="print-report-container sticky top-20 space-y-6 rounded-2xl border border-neutral-800 bg-panel p-5 sm:p-6 shadow-xl">
+            <div className="hidden print:block border-b pb-3">
+              <div className="text-lg font-bold">
+                InvestEdu — Laporan Profil Risiko &amp; Alokasi Portofolio
+              </div>
+              <div className="text-xs">
+                Ringkasan simulasi edukasi investasi personal (bukan nasihat keuangan berlisensi)
+              </div>
+            </div>
             <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
               <div>
                 <span className="text-xs font-medium text-neutral-400">
@@ -332,7 +361,7 @@ export default function RecommendationPage() {
                 }}
                 className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-1.5 text-sm font-semibold text-white focus:border-neutral-500 focus:outline-none"
               />
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="no-print flex flex-wrap gap-1.5 pt-1">
                 {CAPITAL_PRESETS.map((preset) => (
                   <button
                     key={preset}
@@ -364,6 +393,7 @@ export default function RecommendationPage() {
                     item.percentage > 0 && (
                       <div
                         key={item.asset}
+                        data-print-color="true"
                         style={{
                           width: `${item.percentage}%`,
                           backgroundColor: item.color,
@@ -389,6 +419,7 @@ export default function RecommendationPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span
+                          data-print-color="true"
                           className="h-3 w-3 rounded-full shrink-0"
                           style={{ backgroundColor: item.color }}
                         />
@@ -536,6 +567,24 @@ export default function RecommendationPage() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div className="no-print flex flex-wrap gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-neutral-700 bg-neutral-800 px-3.5 py-2.5 text-xs font-semibold text-neutral-200 hover:border-neutral-500 hover:text-white transition-colors"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                <span>Cetak Ringkasan</span>
+              </button>
+              <Link
+                href="/portfolio-sandbox"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2.5 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-colors"
+              >
+                <FlaskConical className="h-3.5 w-3.5" />
+                <span>Simulasi Sandbox</span>
+              </Link>
             </div>
           </div>
         </div>
