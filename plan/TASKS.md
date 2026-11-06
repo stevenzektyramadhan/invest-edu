@@ -413,9 +413,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Pindahkan fungsi murni + tipe terkait (`PriceAlarm`, `OHLCCandle`, `evaluateAlarms`, `generateOHLCCandles`, `formatCompactAxisPrice`) ke `src/lib/`.
 2. Perbarui semua import (komponen, halaman market, test). Isi fungsi **tidak berubah**.
 **Acceptance criteria**:
-- [ ] Modal hanya berisi logika UI.
-- [ ] Test lulus dengan import baru.
-- [ ] `tsc` dan build bersih; tidak ada import `next/server` yang masuk bundle client.
+- [x] Modal hanya berisi logika UI.
+- [x] Test lulus dengan import baru.
+- [x] `tsc` dan build bersih; tidak ada import `next/server` yang masuk bundle client.
 
 ### Task 5.4 — Bersihkan file yang tidak terpakai
 **Tujuan**: Ada file sisa yang membingungkan.
@@ -492,7 +492,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 4.5 — Kesegaran & sumber modul | ✅ Done | Field opsional `lastReviewed` & `sources` (`TODO(owner): verifikasi`), tampilkan "Belum diverifikasi ulang" di footer saat kosong |
 | 5.1 — README | ✅ Done | `README.md` lengkap (tujuan, batasan data, setup lokal, env Turso, perintah verifikasi, arsitektur) + 2 screenshot di `docs/` |
 | 5.2 — Scripts + CI | ✅ Done | Script `typecheck` & `test` di `package.json` + workflow `.github/workflows/ci.yml` |
-| 5.3 — Pindah logika murni | ⏳ Pending | Setelah 1.2, 1.4, 1.6 |
+| 5.3 — Pindah logika murni | ✅ Done | Ekstrak `src/lib/alarms.ts` & `src/lib/chart-data.ts` dari `TradingTerminalModal.tsx`; perbarui import di market & test |
 | 5.4 — Bersihkan file | ⏳ Pending | Tanya pemilik soal `AGENTS.md` |
 | 5.5 — SW killer dev-only | ⏳ Pending | ⚠️ Butuh persetujuan pemilik |
 | 5.6 — Pecah file & satukan quiz | ⏳ Pending | Prioritas rendah |

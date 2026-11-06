@@ -7,11 +7,12 @@ import {
   STATIC_SNAPSHOT_AS_OF,
   type MarketItem,
 } from "@/lib/market-data";
-import TradingTerminalModal, {
-  type PriceAlarm,
+import TradingTerminalModal from "@/components/TradingTerminalModal";
+import {
   evaluateAlarms,
   formatTargetValue,
-} from "@/components/TradingTerminalModal";
+  type PriceAlarm,
+} from "@/lib/alarms";
 import {
   BarChart3,
   RefreshCw,

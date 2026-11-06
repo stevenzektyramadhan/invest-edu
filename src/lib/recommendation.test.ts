@@ -39,11 +39,8 @@ import {
   getSequentialLearningModules,
   hasCompletedCategoryPrerequisites,
 } from "../data/education";
-import {
-  evaluateAlarms,
-  generateOHLCCandles,
-  type PriceAlarm,
-} from "../components/TradingTerminalModal";
+import { evaluateAlarms, type PriceAlarm } from "./alarms";
+import { generateOHLCCandles } from "./chart-data";
 
 assert.equal(classifyRiskScore(5), "Konservatif");
 assert.equal(classifyRiskScore(10), "Moderat");
