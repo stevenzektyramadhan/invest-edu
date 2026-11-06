@@ -401,8 +401,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Tambahkan script: `"typecheck": "tsc --noEmit"`, `"test": "bun src/lib/recommendation.test.ts"`.
 2. Buat workflow GitHub Actions (push & pull request): setup bun → `bun install --frozen-lockfile` → `bun run typecheck` → `bun run test` → `bun run lint` → `bun run build`.
 **Acceptance criteria**:
-- [ ] `bun run typecheck` dan `bun run test` berjalan lokal.
-- [ ] Workflow CI hijau di GitHub.
+- [x] `bun run typecheck` dan `bun run test` berjalan lokal.
+- [x] Workflow CI hijau di GitHub.
 **Catatan**: `next build` mengambil Google Fonts, jadi runner butuh internet (default GitHub Actions sudah punya).
 
 ### Task 5.3 — Pindahkan logika murni keluar dari file komponen
@@ -491,7 +491,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 4.4 — Tautan rekomendasi → modul | ✅ Done | Pemetaan `RECOMMENDATION_ASSET_MODULE_MAP` & `EMERGENCY_FUND_MODULE_ID`, tautan `next/link` "Pelajari: …" di kartu instrumen & banner dana darurat |
 | 4.5 — Kesegaran & sumber modul | ✅ Done | Field opsional `lastReviewed` & `sources` (`TODO(owner): verifikasi`), tampilkan "Belum diverifikasi ulang" di footer saat kosong |
 | 5.1 — README | ✅ Done | `README.md` lengkap (tujuan, batasan data, setup lokal, env Turso, perintah verifikasi, arsitektur) + 2 screenshot di `docs/` |
-| 5.2 — Scripts + CI | ⏳ Pending | |
+| 5.2 — Scripts + CI | ✅ Done | Script `typecheck` & `test` di `package.json` + workflow `.github/workflows/ci.yml` |
 | 5.3 — Pindah logika murni | ⏳ Pending | Setelah 1.2, 1.4, 1.6 |
 | 5.4 — Bersihkan file | ⏳ Pending | Tanya pemilik soal `AGENTS.md` |
 | 5.5 — SW killer dev-only | ⏳ Pending | ⚠️ Butuh persetujuan pemilik |
