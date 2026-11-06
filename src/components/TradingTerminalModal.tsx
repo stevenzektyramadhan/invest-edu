@@ -316,6 +316,9 @@ export default function TradingTerminalModal({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Terminal ${item.symbol} - ${item.name}`}
         style={{ maxHeight: "92vh", width: "min(1200px, 96vw)" }}
         className="flex flex-col rounded-xl border border-slate-800 bg-slate-950 text-slate-200 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}

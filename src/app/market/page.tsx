@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   FALLBACK_ITEMS,
   DEFAULT_MACRO_INDICATORS,
@@ -125,15 +125,19 @@ export default function MarketDashboardPage() {
   const [activeTerminalId, setActiveTerminalId] = useState<string | null>(null);
   const handleCloseTerminal = useCallback(() => setActiveTerminalId(null), []);
 
-  // Price Alarms state persisted in localStorage
   const [alarms, setAlarms] = useState<PriceAlarm[]>([]);
   const [triggeredBanner, setTriggeredBanner] = useState<PriceAlarm | null>(
     null
   );
+  const [notifPerm, setNotifPerm] = useState<string>("default");
+  const pendingDesktopNotifsRef = useRef<PriceAlarm[]>([]);
 
   useEffect(() => {
     const hydrationTimer = window.setTimeout(() => {
       try {
+        if ("Notification" in window) {
+          setNotifPerm(Notification.permission);
+        }
         const saved = localStorage.getItem(ALARMS_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -168,6 +172,44 @@ export default function MarketDashboardPage() {
     }
   }, []);
 
+  const sendDesktopNotification = useCallback((alarm: PriceAlarm) => {
+    if (typeof window === "undefined" || !("Notification" in window)) return;
+    if (Notification.permission === "granted") {
+      try {
+        new Notification(`⏰ Alarm Harga ${alarm.symbol} Tercapai!`, {
+          body: `Target ${
+            alarm.condition === "BELOW" ? "Beli ≤" : "Jual ≥"
+          } ${formatTargetValue(
+            alarm.targetPrice,
+            alarm.unitPrefix,
+            alarm.unitSuffix
+          )} telah tersentuh (${alarm.note}).`,
+        });
+      } catch {
+      }
+    } else if (Notification.permission === "default") {
+      if (!pendingDesktopNotifsRef.current.some((a) => a.id === alarm.id)) {
+        pendingDesktopNotifsRef.current.push(alarm);
+      }
+    }
+  }, []);
+
+  const flushPendingDesktopNotifications = useCallback(
+    (perm: NotificationPermission) => {
+      setNotifPerm(perm);
+      if (perm === "granted" && pendingDesktopNotifsRef.current.length > 0) {
+        const queued = [...pendingDesktopNotifsRef.current];
+        pendingDesktopNotifsRef.current = [];
+        for (const alarm of queued) {
+          sendDesktopNotification(alarm);
+        }
+      } else if (perm === "denied") {
+        pendingDesktopNotifsRef.current = [];
+      }
+    },
+    [sendDesktopNotification]
+  );
+
   const checkAlarmsAgainstItems = useCallback(
     (marketItems: MarketItem[], currentAlarms: PriceAlarm[]) => {
       if (currentAlarms.length === 0 || marketItems.length === 0) return;
@@ -185,25 +227,12 @@ export default function MarketDashboardPage() {
         setTriggeredBanner(newlyTriggered[0]);
         playAlarmChime();
 
-        if (
-          typeof window !== "undefined" &&
-          "Notification" in window &&
-          Notification.permission === "granted"
-        ) {
-          const first = newlyTriggered[0];
-          new Notification(`⏰ Alarm Harga ${first.symbol} Tercapai!`, {
-            body: `Target ${
-              first.condition === "BELOW" ? "Beli ≤" : "Jual ≥"
-            } ${formatTargetValue(
-              first.targetPrice,
-              first.unitPrefix,
-              first.unitSuffix
-            )} telah tersentuh (${first.note}).`,
-          });
+        for (const triggeredAlarm of newlyTriggered) {
+          sendDesktopNotification(triggeredAlarm);
         }
       }
     },
-    [saveAlarms]
+    [saveAlarms, sendDesktopNotification]
   );
 
   const fetchMarket = useCallback(async () => {
@@ -239,9 +268,7 @@ export default function MarketDashboardPage() {
   useEffect(() => {
     const fetchTimer = window.setTimeout(() => void fetchMarket(), 0);
     const pollInterval = window.setInterval(() => {
-      if (document.visibilityState === "visible") {
-        void fetchMarket();
-      }
+      void fetchMarket();
     }, 60_000);
     return () => {
       window.clearTimeout(fetchTimer);
@@ -249,17 +276,18 @@ export default function MarketDashboardPage() {
     };
   }, [fetchMarket]);
 
+  const requestDesktopNotifications = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) return;
+    try {
+      const perm = await Notification.requestPermission();
+      flushPendingDesktopNotifications(perm);
+    } catch {
+    }
+  };
+
   const handleAddAlarm = (
     newAlarmData: Omit<PriceAlarm, "id" | "triggered" | "createdAt">
   ) => {
-    if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "default"
-    ) {
-      Notification.requestPermission().catch(() => {});
-    }
-
     const created: PriceAlarm = {
       ...newAlarmData,
       id: `alm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -273,9 +301,22 @@ export default function MarketDashboardPage() {
     const next = [created, ...alarms];
     saveAlarms(next);
     checkAlarmsAgainstItems(items, next);
+
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      Notification.permission === "default"
+    ) {
+      Notification.requestPermission()
+        .then((perm) => flushPendingDesktopNotifications(perm))
+        .catch(() => {});
+    }
   };
 
   const handleDeleteAlarm = (id: string) => {
+    pendingDesktopNotifsRef.current = pendingDesktopNotifsRef.current.filter(
+      (a) => a.id !== id
+    );
     const next = alarms.filter((a) => a.id !== id);
     saveAlarms(next);
     if (triggeredBanner?.id === id) {
@@ -447,19 +488,33 @@ export default function MarketDashboardPage() {
                 ambil untung pada aset pilihan Anda.
               </p>
               <p className="mt-1 text-[11px] font-medium text-amber-300">
-                Alarm hanya aktif selama halaman ini terbuka.
+                {notifPerm === "granted"
+                  ? "Notifikasi Desktop Aktif — Alarm tetap memberi peringatan walau berpindah tab selama tab ini terbuka."
+                  : "Alarm aktif selama halaman ini terbuka. Aktifkan notifikasi browser untuk peringatan di tab lain."}
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={playAlarmChime}
-            className="inline-flex items-center gap-1.5 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-600 hover:text-white"
-          >
-            <Volume2 className="h-3.5 w-3.5 text-neutral-400" />
-            <span>Tes Suara Alarm</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {notifPerm !== "granted" && (
+              <button
+                type="button"
+                onClick={requestDesktopNotifications}
+                className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20"
+              >
+                <BellRing className="h-3.5 w-3.5" />
+                <span>Aktifkan Notifikasi Browser</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={playAlarmChime}
+              className="inline-flex items-center gap-1.5 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-600 hover:text-white"
+            >
+              <Volume2 className="h-3.5 w-3.5 text-neutral-400" />
+              <span>Tes Suara Alarm</span>
+            </button>
+          </div>
         </div>
 
         {alarms.length > 0 && (
@@ -537,13 +592,11 @@ export default function MarketDashboardPage() {
             <span>Indikator Makroekonomi Acuan</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
-              Data contoh (statis)
+            <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+              Kurs USD/IDR Diperbarui Otomatis
             </span>
-            <span className="text-[11px] text-neutral-500">
-              {STATIC_SNAPSHOT_AS_OF === "TODO(owner)"
-                ? "Data contoh, belum diperbarui"
-                : `Tanggal snapshot: ${STATIC_SNAPSHOT_AS_OF}`}
+            <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
+              BI-Rate, Inflasi &amp; SBN Acuan Statis
             </span>
           </div>
         </div>

@@ -8,18 +8,18 @@
 
 - **Pemula yang baru ingin mulai berinvestasi**: Mempelajari urutan prioritas keuangan (dana darurat, inflasi vs bunga majemuk, dan cara mengenali investasi bodong/pinjol ilegal) melalui jalur belajar bertahap (**"Mulai dari sini"**).
 - **Investor ritel yang ingin menyusun alokasi portofolio**: Mengukur kapasitas dan toleransi risiko secara terpisah melalui kuesioner 5 dimensi untuk mendapatkan simulasi pembagian aset beserta skenario hasil tahunan (buruk/dasar/baik) dan perkiraan penurunan terburuk dalam Rupiah.
-- **Pelajar pasar keuangan**: Memantau perbandingan karakteristik instrumen, mencoba kalkulator DCA (investasi rutin), dan mempelajari grafik pasar maupun simulasi alarm harga.
+- **Pelajar pasar keuangan**: Memantau perbandingan karakteristik instrumen, mencoba kalkulator DCA (investasi rutin), melatih alokasi modal virtual Rp 10 juta di **Paper Sandbox** (`/portfolio-sandbox`), dan mempelajari grafik pasar maupun simulasi alarm harga.
 
 ---
 
 ## Batasan & Penafian Penting (Disclaimer)
 
-1. **Alat Edukasi, Bukan Nasihat Investasi Berizin**: Seluruh materi, kuesioner profil risiko, dan simulasi alokasi portofolio di InvestEdu bersifat edukatif. Tidak ada bagian dari aplikasi ini yang merupakan ajakan jual/beli instrumen keuangan atau rekomendasi penasihat investasi berizin.
+1. **Alat Edukasi, Bukan Nasihat Investasi Berizin**: Seluruh materi, kuesioner profil risiko, simulasi Paper Sandbox, dan rekomendasi alokasi portofolio di InvestEdu bersifat edukatif. Tidak ada bagian dari aplikasi ini yang merupakan ajakan jual/beli instrumen keuangan atau rekomendasi penasihat investasi berizin.
 2. **Status Data Pasar (Live vs Contoh Statis)**:
-   - Harga **Bitcoin (`BTC`)**, **Ethereum (`ETH`)**, **PAX Gold (`PAXG`)**, dan **Emas (`gold-idr`)** diambil dari API publik CoinGecko dengan cache memori 60 detik (dan fallback ke data statis jika API tidak terjangkau).
-   - Data **IHSG (`ihsg`)**, **saham (`bbca`, `bbri`)**, **indeks RDPU (`rdpu-index`)**, serta **indikator makroekonomi** merupakan **data contoh statis** untuk keperluan ilustrasi edukasi dan diberi penanda status secara eksplisit di antarmuka.
-   - Mode grafik **Candle (ilustrasi)** dan **Garis (ilustrasi)** pada modal terminal dibangkitkan secara deterministik dari sparkline, bukan riwayat transaksi bursa sesungguhnya.
-3. **Alarm Harga Berbasis Tab Aktif**: Fitur alarm harga hanya mengevaluasi harga selama halaman `/market` terbuka di peramban (polling setiap 60 detik saat tab terlihat) dan tidak mengirim notifikasi latar belakang saat tab ditutup.
+   - Harga **Bitcoin (`BTC`)**, **Ethereum (`ETH`)**, **PAX Gold (`PAXG`)**, dan **Emas (`gold-idr`)** diambil dari API publik CoinGecko dengan cache memori 60 detik, didukung kurs **USD/IDR** otomatis (`open.er-api.com`, cache 30 menit) sebagai penyesuai harga emas cadangan jika API utama mengalami batas kuota.
+   - Data **IHSG (`ihsg`)**, **saham (`bbca`, `bbri`)**, **indeks RDPU (`rdpu-index`)**, serta indikator makro **BI-Rate, Inflasi, dan SBN** merupakan **data contoh statis** untuk keperluan ilustrasi edukasi dan diberi penanda status secara eksplisit di antarmuka.
+   - Mode grafik **Candle (ilustrasi)** dan **Garis (ilustrasi)** pada modal terminal dibangkitkan secara deterministik dari sparkline 7 hari dalam satuan Rupiah, bukan riwayat transaksi bursa per detik.
+3. **Alarm Harga Berbasis Tab Terbuka & Notifikasi Browser**: Fitur alarm harga mengevaluasi harga setiap 60 detik selama tab `/market` tetap terbuka di peramban (termasuk saat berpindah ke tab lain, mengikuti kebijakan pembatasan timer latar belakang peramban) serta dapat mengirim notifikasi desktop melalui Web Notifications API jika diizinkan pengguna. Alarm tidak berjalan apabila tab atau peramban ditutup sepenuhnya.
 
 ---
 
