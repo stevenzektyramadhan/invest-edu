@@ -9,6 +9,7 @@ import {
   BookOpen,
   Compass,
   Database,
+  FlaskConical,
   Home,
   LogOut,
   ShieldCheck,
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/", label: "Beranda", icon: Home },
   { href: "/education", label: "Edukasi", icon: BookOpen },
   { href: "/recommendation", label: "Rekomendasi", icon: Compass },
+  { href: "/portfolio-sandbox", label: "Sandbox", icon: FlaskConical },
   { href: "/market", label: "Pasar Live", icon: BarChart3 },
 ];
 
@@ -247,7 +249,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-800 bg-background/95 backdrop-blur-md md:hidden"><div className="grid h-16 grid-cols-4">{navItems.map((item) => { const Icon = item.icon; const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href); return <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center gap-1 text-xs font-medium transition-colors ${isActive ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-200"}`}><div className={`flex h-7 w-12 items-center justify-center rounded-full ${isActive ? "bg-neutral-800" : ""}`}><Icon className="h-4 w-4" /></div><span className="text-[11px]">{item.label}</span></Link>; })}</div></nav>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-800 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"><div className="grid h-16 grid-cols-5">{navItems.map((item) => { const Icon = item.icon; const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href); const mobileLabel = item.href === "/market" ? "Pasar" : item.label; return <Link key={item.href} href={item.href} className={`flex min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-xs font-medium transition-colors ${isActive ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-200"}`}><div className={`flex h-7 w-10 items-center justify-center rounded-full ${isActive ? "bg-neutral-800" : ""}`}><Icon className="h-4 w-4" /></div><span className="max-w-full truncate text-[10px] leading-tight">{mobileLabel}</span></Link>; })}</div></nav>
 
       {isAuthOpen && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setIsAuthOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="auth-title" className="w-full max-w-md rounded-2xl border border-neutral-800 bg-panel p-5 shadow-2xl sm:p-6">
