@@ -391,8 +391,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Tulis: tujuan proyek, fitur, tech stack, cara menjalankan (`bun install`, `.env` dari `.env.example`, `bun run dev`), variabel environment (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`), perintah verifikasi, disclaimer ("edukasi, bukan nasihat keuangan"), dan roadmap singkat.
 2. Tambahkan 1–2 screenshot (tempatkan di `docs/`, bukan `tmp/`).
 **Acceptance criteria**:
-- [ ] Orang baru bisa menjalankan proyek hanya dengan mengikuti README.
-- [ ] Tidak ada teks boilerplate "bootstrapped with create-next-app".
+- [x] Orang baru bisa menjalankan proyek hanya dengan mengikuti README.
+- [x] Tidak ada teks boilerplate "bootstrapped with create-next-app".
 
 ### Task 5.2 — Script `test`/`typecheck` dan CI
 **Tujuan**: Test hanya dijalankan manual lewat `bun src/lib/recommendation.test.ts` dan tidak ada CI.
@@ -490,7 +490,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 4.3 — Judul awam (`plainTitle`) | ✅ Done | Field wajib `plainTitle` pada seluruh 21 modul, ditampilkan di atas `title` teknis tanpa mengubah `title` |
 | 4.4 — Tautan rekomendasi → modul | ✅ Done | Pemetaan `RECOMMENDATION_ASSET_MODULE_MAP` & `EMERGENCY_FUND_MODULE_ID`, tautan `next/link` "Pelajari: …" di kartu instrumen & banner dana darurat |
 | 4.5 — Kesegaran & sumber modul | ✅ Done | Field opsional `lastReviewed` & `sources` (`TODO(owner): verifikasi`), tampilkan "Belum diverifikasi ulang" di footer saat kosong |
-| 5.1 — README | ⏳ Pending | |
+| 5.1 — README | ✅ Done | `README.md` lengkap (tujuan, batasan data, setup lokal, env Turso, perintah verifikasi, arsitektur) + 2 screenshot di `docs/` |
 | 5.2 — Scripts + CI | ⏳ Pending | |
 | 5.3 — Pindah logika murni | ⏳ Pending | Setelah 1.2, 1.4, 1.6 |
 | 5.4 — Bersihkan file | ⏳ Pending | Tanya pemilik soal `AGENTS.md` |
