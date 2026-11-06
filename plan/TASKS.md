@@ -436,9 +436,9 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 3. **Jangan** menambahkan service worker yang meng-cache `/_next/static/*` (merusak chunk Turbopack dan hydration, sesuai `AGENTS.md`).
 4. Perbarui bagian terkait di `AGENTS.md` agar mencerminkan perubahan.
 **Acceptance criteria**:
-- [ ] Build produksi tidak menyertakan script pembersih dan tidak memaksa reload.
-- [ ] Dev di `localhost:3000` tetap membersihkan SW lama.
-- [ ] `AGENTS.md` diperbarui; tidak ada hydration mismatch.
+- [x] Build produksi tidak menyertakan script pembersih dan tidak memaksa reload.
+- [x] Dev di `localhost:3000` tetap membersihkan SW lama.
+- [x] `AGENTS.md` diperbarui; tidak ada hydration mismatch.
 
 ### Task 5.6 — Rapikan struktur data dan file besar (prioritas rendah)
 **Tujuan**: `src/data/education.ts` 1.657 baris; setiap modul memiliki `quiz` (tunggal) **dan** `quizzes` (array) yang tumpang tindih.
@@ -494,7 +494,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 5.2 — Scripts + CI | ✅ Done | Script `typecheck` & `test` di `package.json` + workflow `.github/workflows/ci.yml` |
 | 5.3 — Pindah logika murni | ✅ Done | Ekstrak `src/lib/alarms.ts` & `src/lib/chart-data.ts` dari `TradingTerminalModal.tsx`; perbarui import di market & test |
 | 5.4 — Bersihkan file | ✅ Done | Hapus `tmp/img.png` & `public/{next,vercel,file,window,globe}.svg`; hapus `AGENTS.md` dari `.gitignore` sesuai keputusan pemilik |
-| 5.5 — SW killer dev-only | ⏳ Pending | ⚠️ Butuh persetujuan pemilik |
+| 5.5 — SW killer dev-only | ✅ Done | Script inline di `src/app/layout.tsx` dibatasi ke `NODE_ENV === "development"` atas persetujuan pemilik; `public/sw.js` & `AGENTS.md` diperbarui |
 | 5.6 — Pecah file & satukan quiz | ⏳ Pending | Prioritas rendah |
 
 ---
