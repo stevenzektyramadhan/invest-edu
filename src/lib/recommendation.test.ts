@@ -41,6 +41,7 @@ import {
 } from "../data/education";
 import { evaluateAlarms, type PriceAlarm } from "./alarms";
 import { generateOHLCCandles } from "./chart-data";
+import { FALLBACK_ITEMS, evaluatePaperPortfolio } from "./market-data";
 
 assert.equal(classifyRiskScore(5), "Konservatif");
 assert.equal(classifyRiskScore(10), "Moderat");
@@ -564,5 +565,28 @@ for (const score of [5, 10, 15]) {
     }
   }
 }
+
+const mockGoldItem = FALLBACK_ITEMS.find((i) => i.id === "gold-idr")!;
+const paperValuation = evaluatePaperPortfolio(
+  [
+    {
+      id: "pos-1",
+      assetId: "gold-idr",
+      symbol: mockGoldItem.symbol,
+      name: mockGoldItem.name,
+      units: 2_000_000 / 1_000_000,
+      avgEntryPrice: 1_000_000,
+      investedIdr: 2_000_000,
+    },
+  ],
+  [{ ...mockGoldItem, rawPrice: 1_500_000, dataStatus: "live" }],
+  8_000_000,
+  10_000_000
+);
+assert.equal(paperValuation.holdingsMarketValue, 3_000_000);
+assert.equal(paperValuation.totalEquity, 11_000_000);
+assert.equal(paperValuation.totalPnlIdr, 1_000_000);
+assert.equal(paperValuation.totalPnlPct, 10);
+assert.equal(paperValuation.enriched[0]?.pnlPct, 50);
 
 console.log("self-check passed: allocation, alarms, auth, and user state verified");

@@ -236,3 +236,52 @@ export const FALLBACK_ITEMS: MarketItem[] = [
     asOf: STATIC_SNAPSHOT_AS_OF,
   },
 ];
+
+export interface PaperPosition {
+  id: string;
+  assetId: string;
+  symbol: string;
+  name: string;
+  units: number;
+  avgEntryPrice: number;
+  investedIdr: number;
+}
+
+export function evaluatePaperPortfolio(
+  positions: PaperPosition[],
+  marketItems: MarketItem[],
+  cashIdr: number,
+  initialCash = 10_000_000
+) {
+  const priceLookup = new Map(marketItems.map((it) => [it.id, it]));
+  const enriched = positions.map((pos) => {
+    const liveItem = priceLookup.get(pos.assetId);
+    const currentPrice = liveItem ? liveItem.rawPrice : pos.avgEntryPrice;
+    const currentValue = Math.round(pos.units * currentPrice);
+    const pnlIdr = currentValue - pos.investedIdr;
+    const pnlPct = pos.investedIdr > 0 ? (pnlIdr / pos.investedIdr) * 100 : 0;
+    return {
+      ...pos,
+      currentPrice,
+      currentValue,
+      pnlIdr,
+      pnlPct,
+      dataStatus: liveItem?.dataStatus ?? ("static" as const),
+    };
+  });
+
+  const holdingsMarketValue = enriched.reduce((sum, p) => sum + p.currentValue, 0);
+  const totalInvestedCost = enriched.reduce((sum, p) => sum + p.investedIdr, 0);
+  const totalEquity = cashIdr + holdingsMarketValue;
+  const totalPnlIdr = totalEquity - initialCash;
+  const totalPnlPct = initialCash > 0 ? ((totalEquity - initialCash) / initialCash) * 100 : 0;
+
+  return {
+    enriched,
+    holdingsMarketValue,
+    totalInvestedCost,
+    totalEquity,
+    totalPnlIdr,
+    totalPnlPct,
+  };
+}
