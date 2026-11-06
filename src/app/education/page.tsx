@@ -27,6 +27,7 @@ import {
   Sparkles,
   X,
   BookOpen,
+  Award,
 } from "lucide-react";
 import {
   MODULES_STORAGE_KEY,
@@ -127,11 +128,17 @@ export default function EducationPage() {
 
   const categoryBreakdown = useMemo(
     () =>
-      ASSET_CATEGORIES.map((category) => ({
-        category,
-        count: EDUCATION_MODULES.filter((module) => module.category === category).length,
-      })),
-    []
+      ASSET_CATEGORIES.map((category) => {
+        const mods = EDUCATION_MODULES.filter((module) => module.category === category);
+        const completedCount = mods.filter((module) => completedIds.includes(module.id)).length;
+        return {
+          category,
+          count: mods.length,
+          completedCount,
+          isGraduated: mods.length > 0 && completedCount === mods.length,
+        };
+      }),
+    [completedIds]
   );
 
   const levelBreakdown = useMemo(
@@ -276,12 +283,36 @@ export default function EducationPage() {
             <p className="mt-1 text-xs text-neutral-500">modul mendalam dan berurutan</p>
           </div>
           <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4">
-            <div className="text-xs font-medium text-neutral-400">Menurut Kelas Aset</div>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-medium text-neutral-400">Pencapaian per Kelas Aset</div>
+              <span className="text-[11px] font-semibold text-emerald-400">
+                {categoryBreakdown.filter((c) => c.isGraduated).length} / {ASSET_CATEGORIES.length} Lulus
+              </span>
+            </div>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
-              {categoryBreakdown.map(({ category, count }) => (
-                <div key={category} className="rounded-lg bg-neutral-950/80 border border-neutral-800/60 px-2.5 py-2">
-                  <div className="text-[11px] text-neutral-400">{category}</div>
-                  <div className="mt-0.5 text-sm font-bold text-neutral-100">{count} modul</div>
+              {categoryBreakdown.map(({ category, count, completedCount, isGraduated }) => (
+                <div
+                  key={category}
+                  className={`rounded-lg border px-2.5 py-2 ${
+                    isGraduated
+                      ? "border-emerald-500/40 bg-emerald-500/10"
+                      : "border-neutral-800/60 bg-neutral-950/80"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-[11px] text-neutral-300 font-medium">{category}</span>
+                    {isGraduated && (
+                      <Award className="h-3.5 w-3.5 text-emerald-400 shrink-0" aria-label="Lulus" />
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-xs font-bold text-neutral-100">
+                    {completedCount}/{count} selesai
+                  </div>
+                  {isGraduated && (
+                    <div className="mt-1 inline-block rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-300">
+                      LULUS TRACK
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
