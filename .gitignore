@@ -49,3 +49,7 @@ next-env.d.ts
 
 .multibrain
 .omo
+.agents/
+.claude
+.opencode
+plan
