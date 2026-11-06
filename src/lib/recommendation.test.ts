@@ -539,6 +539,10 @@ assert.equal(
 
 const validModuleIds = new Set(EDUCATION_MODULES.map((m) => m.id));
 assert.ok(validModuleIds.has(EMERGENCY_FUND_MODULE_ID));
+for (const mod of EDUCATION_MODULES) {
+  assert.ok(Array.isArray(mod.quizzes) && mod.quizzes.length > 0);
+  assert.equal("quiz" in mod, false);
+}
 for (const ids of Object.values(RECOMMENDATION_ASSET_MODULE_MAP)) {
   assert.ok(ids.length > 0);
   const resolved = getEducationModulesByIds(ids);

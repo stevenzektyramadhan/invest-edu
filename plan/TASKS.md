@@ -447,8 +447,8 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 1. Periksa pemakaian `quiz` vs `quizzes` di `education/page.tsx`; satukan menjadi satu field bila memungkinkan tanpa mengubah perilaku.
 2. Pecah `education.ts` per kategori (`src/data/education/saham.ts`, dst.) dengan satu `index.ts` yang mengekspor semuanya.
 **Acceptance criteria**:
-- [ ] Refactor murni: halaman edukasi menampilkan konten identik sebelum dan sesudah.
-- [ ] `tsc` bersih dan semua id modul tetap sama.
+- [x] Refactor murni: halaman edukasi menampilkan konten identik sebelum dan sesudah.
+- [x] `tsc` bersih dan semua id modul tetap sama.
 
 ---
 
@@ -495,7 +495,7 @@ Kamu adalah AI agent yang mengimplementasikan task di dokumen ini. Baca **seluru
 | 5.3 — Pindah logika murni | ✅ Done | Ekstrak `src/lib/alarms.ts` & `src/lib/chart-data.ts` dari `TradingTerminalModal.tsx`; perbarui import di market & test |
 | 5.4 — Bersihkan file | ✅ Done | Hapus `tmp/img.png` & `public/{next,vercel,file,window,globe}.svg`; hapus `AGENTS.md` dari `.gitignore` sesuai keputusan pemilik |
 | 5.5 — SW killer dev-only | ✅ Done | Script inline di `src/app/layout.tsx` dibatasi ke `NODE_ENV === "development"` atas persetujuan pemilik; `public/sw.js` & `AGENTS.md` diperbarui |
-| 5.6 — Pecah file & satukan quiz | ⏳ Pending | Prioritas rendah |
+| 5.6 — Pecah file & satukan quiz | ✅ Done | Hapus field duplikat `quiz` (sisakan `quizzes: QuizQuestion[]`) & pecah modul per kategori ke `src/data/education/{types,dasar,reksa-dana,emas,saham,kripto}.ts` |
 
 ---
 
