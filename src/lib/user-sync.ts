@@ -64,7 +64,8 @@ export function applyCloudStateToLocal(state: UserStateData | null | undefined):
     localStorage.setItem(MODULES_STORAGE_KEY, JSON.stringify(state.completedModules));
     localStorage.setItem(RISK_STORAGE_KEY, JSON.stringify(state.riskState));
     localStorage.setItem(ALARMS_STORAGE_KEY, JSON.stringify(state.priceAlarms));
-  } catch {
+  } catch (error) {
+    console.warn("Failed to cache cloud state locally:", error);
   }
 
   window.dispatchEvent(new CustomEvent(SYNC_EVENT_NAME, { detail: state }));
@@ -80,7 +81,11 @@ export async function pushUserStateToCloud(
       body: JSON.stringify(partial),
     });
 
-    if (!response.ok && response.status !== 401) return;
-  } catch {
+    // 401 = guest mode; localStorage already holds the state.
+    if (!response.ok && response.status !== 401) {
+      console.warn(`Cloud sync failed: HTTP ${response.status}`);
+    }
+  } catch (error) {
+    console.warn("Cloud sync failed:", error);
   }
 }
