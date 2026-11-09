@@ -88,6 +88,98 @@ export async function GET() {
   let liveSourceUsed = false;
   const liveAsOf = new Date(now).toISOString();
 
+  // Yahoo Finance chart API — unofficial, no key needed; BEI data ~15min delayed
+  const YAHOO_SYMBOLS: { itemId: string; ticker: string; currency: "IDR" | "USD" }[] = [
+    { itemId: "ihsg", ticker: "%5EJKSE", currency: "IDR" },
+    { itemId: "bbca", ticker: "BBCA.JK", currency: "IDR" },
+    { itemId: "bbri", ticker: "BBRI.JK", currency: "IDR" },
+    { itemId: "sp500", ticker: "%5EGSPC", currency: "USD" },
+  ];
+
+  const yahooResults = await Promise.allSettled(
+    YAHOO_SYMBOLS.map(({ ticker }) =>
+      fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=7d&interval=1d`,
+        {
+          signal: AbortSignal.timeout(2000),
+          headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0" },
+        }
+      ).then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    )
+  );
+
+  for (let i = 0; i < YAHOO_SYMBOLS.length; i++) {
+    const result = yahooResults[i];
+    if (result.status !== "fulfilled") continue;
+    try {
+      const data = result.value;
+      const r = data?.chart?.result?.[0];
+      if (!r) continue;
+      const meta = r.meta;
+      const rawPriceUsd: number = meta?.regularMarketPrice;
+      if (!rawPriceUsd || !Number.isFinite(rawPriceUsd)) continue;
+
+      const { itemId, currency } = YAHOO_SYMBOLS[i];
+      // S&P 500 rawPrice stays in pts (USD) to match unitSuffix " pts" and paper-trade logic
+      const rawPrice =
+        currency === "USD"
+          ? Number(rawPriceUsd.toFixed(2))
+          : Math.round(rawPriceUsd);
+      const high24h =
+        currency === "USD"
+          ? Number((meta.regularMarketDayHigh ?? rawPriceUsd * 1.015).toFixed(2))
+          : Math.round(meta.regularMarketDayHigh ?? rawPriceUsd * 1.015);
+      const low24h =
+        currency === "USD"
+          ? Number((meta.regularMarketDayLow ?? rawPriceUsd * 0.985).toFixed(2))
+          : Math.round(meta.regularMarketDayLow ?? rawPriceUsd * 0.985);
+      const prevClose: number = meta.chartPreviousClose ?? meta.previousClose ?? rawPriceUsd;
+      const change24h = Number((((rawPriceUsd - prevClose) / prevClose) * 100).toFixed(2));
+
+      const closes: number[] = r.indicators?.quote?.[0]?.close ?? [];
+      const validCloses = closes.filter((v: number | null) => v != null && Number.isFinite(v));
+      const sparkline =
+        validCloses.length >= 4
+          ? currency === "USD"
+            ? validCloses.map((p: number) => Number(p.toFixed(2)))
+            : validCloses.map((p: number) => Math.round(p))
+          : items[items.findIndex((it) => it.id === itemId)]?.sparkline ?? [];
+
+      const firstClose = validCloses[0];
+      const lastClose = validCloses[validCloses.length - 1];
+      const change7d =
+        validCloses.length >= 2 && firstClose > 0
+          ? Number((((lastClose - firstClose) / firstClose) * 100).toFixed(2))
+          : 0;
+
+      const idx = items.findIndex((it) => it.id === itemId);
+      if (idx === -1) continue;
+
+      const sourceLabel =
+        currency === "IDR" ? "Yahoo Finance (BEI ~15 mnt)" : "Yahoo Finance (USD pts)";
+
+      items[idx] = {
+        ...items[idx],
+        rawPrice,
+        high24h,
+        low24h,
+        priceDisplay:
+          items[idx].unitPrefix === ""
+            ? rawPrice.toLocaleString("id-ID", { maximumFractionDigits: 2 })
+            : formatIDR(rawPrice),
+        change24h,
+        change7d,
+        sparkline,
+        source: sourceLabel,
+        dataStatus: "live",
+        asOf: liveAsOf,
+      };
+      liveSourceUsed = true;
+    } catch {
+      /* */
+    }
+  }
+
   try {
     const cgRes = await fetch(
       "https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&ids=bitcoin,ethereum,pax-gold&sparkline=true&price_change_percentage=24h,7d",
