@@ -93,17 +93,14 @@ function invalidRequest(message: string): NextResponse {
 }
 
 function getClientIp(request: Request): string {
-  // TODO(owner): Verify target deployment platform (e.g., Vercel) and lock client IP extraction to platform-trusted headers only.
-  const vercelIp = request.headers
-    .get("x-vercel-forwarded-for")
-    ?.split(",")[0]
-    ?.trim();
-  if (vercelIp) return vercelIp;
-
-  const realIp = request.headers.get("x-real-ip")?.trim();
-  if (realIp) return realIp;
-
-  return "local";
+  // Vercel overwrites x-vercel-forwarded-for at the edge, so it is only trusted
+  // when running on Vercel; elsewhere any client-supplied IP header is spoofable.
+  // ponytail: non-Vercel hosts share one "local" bucket; add that platform's trusted header if deployed elsewhere.
+  if (!process.env.VERCEL) return "local";
+  return (
+    request.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() ||
+    "local"
+  );
 }
 
 export async function GET() {
@@ -189,11 +186,23 @@ export async function POST(request: Request) {
         );
       }
 
-      const user = await createUser({
-        email,
-        name: body.name?.trim() || email,
-        passwordHash: await hashPassword(password),
-      });
+      let user;
+      try {
+        user = await createUser({
+          email,
+          name: body.name?.trim() || email,
+          passwordHash: await hashPassword(password),
+        });
+      } catch (error) {
+        // Concurrent register with the same email loses the race on users.email UNIQUE.
+        if (error instanceof Error && error.message.includes("UNIQUE")) {
+          return NextResponse.json(
+            { error: "Email sudah terdaftar. Silakan masuk." },
+            { status: 409 }
+          );
+        }
+        throw error;
+      }
       const state = await saveUserStateToDb(
         user.id,
         sanitizeUserState(body.initialState)
